@@ -41,6 +41,7 @@ const api_server_1 = require("./api-server");
 const initSwagger_1 = require("./initSwagger");
 const spinalAPIMiddleware_1 = require("./spinalAPIMiddleware");
 exports.SpinalAPIMiddleware = spinalAPIMiddleware_1.default;
+const path = require("path");
 const config = require("../config");
 function runServerRest(server, app, spinalAPIMiddleware) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -50,14 +51,16 @@ function runServerRest(server, app, spinalAPIMiddleware) {
         let api = app || (0, api_server_1.default)();
         server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
         if (!spinalAPIMiddleware) {
-            spinalAPIMiddleware = new spinalAPIMiddleware_1.default();
+            spinalAPIMiddleware = spinalAPIMiddleware_1.default.getInstance();
             yield spinalAPIMiddleware.initGraph();
         }
         (0, initSwagger_1.initSwaggerDoc)(api);
         (0, socket_1.runSocketServer)(server);
         (0, routes_1.default)(logger, api, spinalAPIMiddleware);
         api.get('/logo.png', (req, res) => {
-            res.sendFile('spinalcore.png', { root: __dirname });
+            const assets = path.resolve(__dirname, '../assets');
+            res.sendFile(`${assets}/spinalcore.png`);
+            // res.sendFile('spinalcore.png', { root: __dirname });
         });
     });
 }

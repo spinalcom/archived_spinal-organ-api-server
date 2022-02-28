@@ -33,7 +33,7 @@ import { runSocketServer } from './socket'
 import APIServer from "./api-server";
 import { initSwaggerDoc } from "./initSwagger";
 import SpinalAPIMiddleware from "./spinalAPIMiddleware";
-
+import * as path from "path";
 
 import * as config from "../config";
 
@@ -46,7 +46,7 @@ async function runServerRest(server?: HttpServer, app?: express.Express, spinalA
   let api = app || APIServer();
   server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`))
   if (!spinalAPIMiddleware) {
-    spinalAPIMiddleware = new SpinalAPIMiddleware();
+    spinalAPIMiddleware = SpinalAPIMiddleware.getInstance();
     await spinalAPIMiddleware.initGraph();
   }
 
@@ -56,7 +56,9 @@ async function runServerRest(server?: HttpServer, app?: express.Express, spinalA
 
 
   api.get('/logo.png', (req, res) => {
-    res.sendFile('spinalcore.png', { root: __dirname });
+    const assets = path.resolve(__dirname, '../assets');
+    res.sendFile(`${assets}/spinalcore.png`)
+    // res.sendFile('spinalcore.png', { root: __dirname });
   });
 
 }
