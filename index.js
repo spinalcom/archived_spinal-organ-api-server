@@ -25,7 +25,7 @@
 const { runServerRest, SpinalAPIMiddleware } = require("./build");
 
 // Uncomment the line below to create and use a server
-runServerRest();
+//runServerRest();
 
 module.exports = {
   runServerRest,

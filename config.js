@@ -24,17 +24,17 @@
 
 module.exports = {
   spinalConnector: {
-    user: process.env.SPINAL_USER_ID || "EDIT_ME", // user id
-    password: process.env.SPINAL_PASSWORD || "EDIT_ME", // user password
-    host: process.env.SPINALHUB_IP || "EDIT_ME", // can be an ip address
-    port: process.env.SPINALHUB_PORT || 10120, // port
+    user: process.env.SPINAL_USER_ID, // user id
+    password: process.env.SPINAL_PASSWORD, // user password
+    host: process.env.SPINALHUB_IP, // can be an ip address
+    port: process.env.SPINALHUB_PORT, // port
   },
   api: {
-    host: process.env.REQUESTS_HOST || "EDIT_ME", // internal port
-    port: process.env.REQUESTS_PORT || 3000, // internal port
+    host: process.env.REQUESTS_HOST, // internal port
+    port: process.env.REQUESTS_PORT, // internal port
   },
   file: {
     // path to a digital twin in spinalhub filesystem
-    path: process.env.SPINAL_DTWIN_PATH || "EDIT_ME",
+    path: process.env.SPINAL_DTWIN_PATH,
   },
 };

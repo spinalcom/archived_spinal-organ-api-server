@@ -65,5 +65,4 @@ function runServerRest(server, app, spinalAPIMiddleware) {
     });
 }
 exports.runServerRest = runServerRest;
-exports.default = runServerRest;
 //# sourceMappingURL=index.js.map

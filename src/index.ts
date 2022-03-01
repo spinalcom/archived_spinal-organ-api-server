@@ -63,6 +63,6 @@ async function runServerRest(server?: HttpServer, app?: express.Express, spinalA
 
 }
 
-export default runServerRest;
+//export default runServerRest;
 
 export { runServerRest, SpinalAPIMiddleware }
