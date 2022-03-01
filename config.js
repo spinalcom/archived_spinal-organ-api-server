@@ -22,6 +22,8 @@
  *  <http://resources.spinalcom.com/licenses.pdf>.
  */
 
+require("dotenv").config();
+
 module.exports = {
   spinalConnector: {
     user: process.env.SPINAL_USER_ID, // user id

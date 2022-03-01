@@ -23,8 +23,7 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import * as dotenv from "dotenv";
-dotenv.config();
+
 
 import * as express from 'express';
 import { Server as HttpServer } from 'http';

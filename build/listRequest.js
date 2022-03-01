@@ -26,8 +26,33 @@ exports.getListRequest = void 0;
  */
 const path = require("path");
 // import arrayOfRequests from "./absfiles"
-const arrayOfRequests = require("../finalList");
+// import { arrayOfRequests } from "./finalList";
 // List all files in a directory in Node.js recursively in a synchronous fashion
+function getListRequest() {
+    const routeDir = path.join(__dirname, 'routes');
+    const absfiles = walkSync(routeDir);
+    return absfiles.map(el => path.resolve(__dirname, el));
+    // var doNotMatch = [];
+    // var MatchList = [];
+    // for (var i = 0; i < absfiles.length; i++) {
+    //     if (arrayOfRequests.indexOf(absfiles[i]) == -1) { doNotMatch.push(absfiles[i]); }
+    // }
+    // MatchList = arrayOfRequests.concat(doNotMatch)
+    // require('fs').writeFile(
+    //     './finalList.ts', 'module.exports = ' +
+    // JSON.stringify(MatchList, null, 2),
+    //     function (err) {
+    //         if (err) {
+    //             console.error('Crap happens');
+    //         }
+    //     }
+    // );
+    // const mapList = MatchList.map((el) => {
+    //     return path.resolve(__dirname, el)
+    // })
+    // return mapList;
+}
+exports.getListRequest = getListRequest;
 var walkSync = function (dir, filelist) {
     var path = path || require('path');
     var fs = fs || require('fs'), files = fs.readdirSync(dir);
@@ -40,28 +65,9 @@ var walkSync = function (dir, filelist) {
             filelist.push(path.relative(__dirname, path.join(dir, file)));
         }
     });
+    filelist.sort((a, b) => getIndexCat(a) - getIndexCat(b));
     return filelist;
 };
-const routeDir = path.join(__dirname, "..", "src", 'routes');
-const absfiles = walkSync(routeDir);
-const orderCat = [
-    "contexts",
-    "nodes",
-    "categoriesAttributs",
-    "attributs",
-    "geographicContext",
-    "IoTNetwork",
-    "tickets",
-    "notes",
-    "calendar",
-    "groupContext",
-    "roomGroup",
-    "equipementGroup",
-    "endpointGroup",
-    "Nomenclature Group",
-    "Analytics",
-    "BIM"
-];
 function getCat(filePath) {
     const dir = filePath.split(path.sep);
     for (let idx = 0; idx < dir.length; idx++) {
@@ -70,33 +76,12 @@ function getCat(filePath) {
     }
 }
 function getIndexCat(filePath) {
+    const orderCat = [
+        "contexts", "nodes", "categoriesAttributs", "attributs", "geographicContext", "IoTNetwork", "tickets", "notes", "calendar", "groupContext", "roomGroup", "equipementGroup", "endpointGroup", "Nomenclature Group", "Analytics", "BIM"
+    ];
     const dir = getCat(filePath);
     if (!dir)
         return 9999;
     return orderCat.indexOf(dir);
 }
-absfiles.sort((a, b) => {
-    return getIndexCat(a) - getIndexCat(b);
-});
-var doNotMatch = [];
-var MatchList = [];
-for (var i = 0; i < absfiles.length; i++) {
-    if (arrayOfRequests.indexOf(absfiles[i]) == -1) {
-        doNotMatch.push(absfiles[i]);
-    }
-}
-MatchList = arrayOfRequests.concat(doNotMatch);
-function getListRequest() {
-    require('fs').writeFile('./finalList.js', 'module.exports = ' +
-        JSON.stringify(MatchList, null, 2), function (err) {
-        if (err) {
-            console.error('Crap happens');
-        }
-    });
-    const mapList = MatchList.map((el) => {
-        return path.resolve(__dirname, el);
-    });
-    return mapList;
-}
-exports.getListRequest = getListRequest;
 //# sourceMappingURL=listRequest.js.map

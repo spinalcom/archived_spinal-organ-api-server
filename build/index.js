@@ -33,8 +33,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpinalAPIMiddleware = exports.runServerRest = void 0;
-const dotenv = require("dotenv");
-dotenv.config();
 const routes_1 = require("./routes/routes");
 const socket_1 = require("./socket");
 const api_server_1 = require("./api-server");
