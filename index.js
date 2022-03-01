@@ -22,12 +22,12 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-const { runServerRest, SpinalAPIMiddleware } = require("./build");
+const { runServerRest, spinalAPIMiddleware } = require("./build");
 
 // Uncomment the line below to create and use a server
 // runServerRest();
 
 module.exports = {
   runServerRest,
-  SpinalAPIMiddleware,
+  spinalAPIMiddleware,
 };

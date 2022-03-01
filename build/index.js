@@ -32,26 +32,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpinalAPIMiddleware = exports.runServerRest = void 0;
+exports.spinalAPIMiddleware = exports.runServerRest = void 0;
 const routes_1 = require("./routes/routes");
 const socket_1 = require("./socket");
 const api_server_1 = require("./api-server");
 const initSwagger_1 = require("./initSwagger");
 const spinalAPIMiddleware_1 = require("./spinalAPIMiddleware");
-exports.SpinalAPIMiddleware = spinalAPIMiddleware_1.default;
 const path = require("path");
 const config = require("../config");
-function runServerRest(server, app, spinalAPIMiddleware) {
+const spinalAPIMiddleware = spinalAPIMiddleware_1.default.getInstance();
+exports.spinalAPIMiddleware = spinalAPIMiddleware;
+function runServerRest(server, app) {
     return __awaiter(this, void 0, void 0, function* () {
         let host = config.api.host;
         let port = config.api.port;
         let logger = {};
+        if (!app || !server)
+            yield spinalAPIMiddleware.initGraph();
         let api = app || (0, api_server_1.default)();
         server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
-        if (!spinalAPIMiddleware) {
-            spinalAPIMiddleware = spinalAPIMiddleware_1.default.getInstance();
-            yield spinalAPIMiddleware.initGraph();
-        }
         (0, initSwagger_1.initSwaggerDoc)(api);
         (0, socket_1.runSocketServer)(server);
         (0, routes_1.default)(logger, api, spinalAPIMiddleware);

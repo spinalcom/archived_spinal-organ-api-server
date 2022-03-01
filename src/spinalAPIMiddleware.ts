@@ -49,11 +49,14 @@ class SpinalAPIMiddleware {
     this.loadedPtr = new Map();
   }
 
-  initGraph(graph?: SpinalGraph<any>, connect?: spinal.FileSystem) {
-    if (!connect || !graph) this.connectAndLoadGraph();
+  setConnection(connect: spinal.FileSystem) {
+    this.conn = connect;
+  }
+
+  initGraph(graph?: SpinalGraph<any>,) {
+    if (!graph) this.connectAndLoadGraph();
     else {
       try {
-        this.conn = connect;
         this.onLoadSuccess(graph);
       } catch (error) {
         this.onLoadError();
@@ -78,8 +81,8 @@ class SpinalAPIMiddleware {
   }
 
   // called if connected to the server and if the spinalhub sent us the Model
-  onLoadSuccess(forgeFile): void {
-    SpinalGraphService.setGraphFromForgeFile(forgeFile)
+  onLoadSuccess(forgeFile: SpinalGraph<any>): void {
+    SpinalGraphService.setGraph(forgeFile)
       .then((id) => {
         if (typeof id !== 'undefined') {
           SpinalServiceUser.init();

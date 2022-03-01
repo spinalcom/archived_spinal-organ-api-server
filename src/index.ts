@@ -37,17 +37,19 @@ import * as path from "path";
 import * as config from "../config";
 
 
-async function runServerRest(server?: HttpServer, app?: express.Express, spinalAPIMiddleware?: SpinalAPIMiddleware) {
+const spinalAPIMiddleware = SpinalAPIMiddleware.getInstance();
+
+
+async function runServerRest(server?: HttpServer, app?: express.Express) {
   let host = config.api.host
   let port = config.api.port
   let logger = {};
 
+  if (!app || !server) await spinalAPIMiddleware.initGraph();
+
   let api = app || APIServer();
-  server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`))
-  if (!spinalAPIMiddleware) {
-    spinalAPIMiddleware = SpinalAPIMiddleware.getInstance();
-    await spinalAPIMiddleware.initGraph();
-  }
+  server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
+
 
   initSwaggerDoc(api);
   runSocketServer(server);
@@ -64,4 +66,4 @@ async function runServerRest(server?: HttpServer, app?: express.Express, spinalA
 
 //export default runServerRest;
 
-export { runServerRest, SpinalAPIMiddleware }
+export { runServerRest, spinalAPIMiddleware }

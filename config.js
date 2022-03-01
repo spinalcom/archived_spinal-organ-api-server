@@ -26,17 +26,17 @@ require("dotenv").config();
 
 module.exports = {
   spinalConnector: {
-    user: process.env.SPINAL_USER_ID, // user id
-    password: process.env.SPINAL_PASSWORD, // user password
-    host: process.env.SPINALHUB_IP, // can be an ip address
-    port: process.env.SPINALHUB_PORT, // port
+    user: process.env.SPINAL_USER_ID || "EDIT_ME", // user id
+    password: process.env.SPINAL_PASSWORD || "EDIT_ME", // user password
+    host: process.env.SPINALHUB_IP || "localhost", // can be an ip address
+    port: process.env.SPINALHUB_PORT || 10120, // port
   },
   api: {
-    host: process.env.REQUESTS_HOST, // internal port
-    port: process.env.REQUESTS_PORT, // internal port
+    host: process.env.REQUESTS_HOST || "localhost", // internal port
+    port: process.env.REQUESTS_PORT || 3000, // internal port
   },
   file: {
     // path to a digital twin in spinalhub filesystem
-    path: process.env.SPINAL_DTWIN_PATH,
+    path: process.env.SPINAL_DTWIN_PATH || "EDIT_ME",
   },
 };

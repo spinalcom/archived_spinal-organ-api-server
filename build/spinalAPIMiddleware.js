@@ -40,12 +40,14 @@ class SpinalAPIMiddleware {
         }
         return SpinalAPIMiddleware.instance;
     }
-    initGraph(graph, connect) {
-        if (!connect || !graph)
+    setConnection(connect) {
+        this.conn = connect;
+    }
+    initGraph(graph) {
+        if (!graph)
             this.connectAndLoadGraph();
         else {
             try {
-                this.conn = connect;
                 this.onLoadSuccess(graph);
             }
             catch (error) {
@@ -67,7 +69,7 @@ class SpinalAPIMiddleware {
     }
     // called if connected to the server and if the spinalhub sent us the Model
     onLoadSuccess(forgeFile) {
-        spinal_env_viewer_graph_service_1.SpinalGraphService.setGraphFromForgeFile(forgeFile)
+        spinal_env_viewer_graph_service_1.SpinalGraphService.setGraph(forgeFile)
             .then((id) => {
             if (typeof id !== 'undefined') {
                 SpinalServiceUser.init();

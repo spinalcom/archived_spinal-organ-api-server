@@ -22,7 +22,7 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 var proxy = require('express-http-proxy');
-const config = require('../../../../config');
+const config = require("../../../../config");
 function createUrl(urlStr, port) {
     urlStr = urlStr.startsWith('http') ? urlStr : `http://${urlStr}`;
     urlStr = typeof port !== "undefined" ? `${urlStr}:${port}` : urlStr;
