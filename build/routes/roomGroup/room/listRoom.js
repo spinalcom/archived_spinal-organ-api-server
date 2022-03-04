@@ -36,18 +36,32 @@ const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-servi
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
      * @swagger
-     * /api/v1/equipement/{id}/file_list:
+     * /api/v1/roomsGroup/{contextId}/category/{categoryId}/group/{groupId}/roomList:
      *   get:
      *     security:
      *       - OauthSecurity:
      *         - readOnly
-     *     description: Returns files of equipement
-     *     summary: Get list files of equipement
+     *     description: read room list
+     *     summary: Get room list from rooms Group
      *     tags:
-     *       - Geographic Context
+     *       - Rooms Group
      *     parameters:
      *      - in: path
-     *        name: id
+     *        name: contextId
+     *        description: use the dynamic ID
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          format: int64
+     *      - in: path
+     *        name: categoryId
+     *        description: use the dynamic ID
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          format: int64
+     *      - in: path
+     *        name: groupId
      *        description: use the dynamic ID
      *        required: true
      *        schema:
@@ -61,39 +75,52 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
      *             schema:
      *               type: array
      *               items:
-     *                $ref: '#/components/schemas/File'
+     *                $ref: '#/components/schemas/BasicNode'
      *       400:
      *         description: Bad request
      */
-    app.get('/api/v1/equipement/:id/file_list', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    app.get('/api/v1/roomsGroup/:contextId/category/:categoryId/group/:groupId/roomList', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var equipement = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            var _roomList = [];
+            var context = yield spinalAPIMiddleware.load(parseInt(req.params.contextId, 10));
             //@ts-ignore
-            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(equipement);
-            if (equipement.getType().get() === 'BIMObject') {
-                // Files
-                var _files = [];
-                var fileNode = (yield equipement.getChildren('hasFiles'))[0];
-                if (fileNode) {
-                    var filesfromElement = yield fileNode.element.load();
-                    for (let index = 0; index < filesfromElement.length; index++) {
-                        let infoFiles = {
-                            dynamicId: filesfromElement[index]._server_id,
-                            Name: filesfromElement[index].name.get(),
+            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
+            var category = yield spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10));
+            //@ts-ignore
+            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(category);
+            var group = yield spinalAPIMiddleware.load(parseInt(req.params.groupId, 10));
+            //@ts-ignore
+            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(group);
+            if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext &&
+                category.belongsToContext(context) &&
+                group.belongsToContext(context)) {
+                if (context.getType().get() === 'geographicRoomGroupContext') {
+                    const roomList = yield group.getChildren('groupHasgeographicRoom');
+                    for (const room of roomList) {
+                        var info = {
+                            dynamicId: room._server_id,
+                            staticId: room.getId().get(),
+                            name: room.getName().get(),
+                            type: room.getType().get(),
                         };
-                        _files.push(infoFiles);
+                        _roomList.push(info);
                     }
+                }
+                else {
+                    res
+                        .status(400)
+                        .send('node is not type of geographicRoomGroupContext ');
                 }
             }
             else {
-                res.status(400).send('node is not of type  BIMObject');
+                res.status(400).send('category or group not found in context');
             }
         }
         catch (error) {
             console.log(error);
             res.status(400).send('ko');
         }
-        res.json(_files);
+        res.json(_roomList);
     }));
 };
-//# sourceMappingURL=equipementFileList.js.map
+//# sourceMappingURL=listRoom.js.map

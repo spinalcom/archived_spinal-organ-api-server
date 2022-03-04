@@ -22,64 +22,135 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import {
+  SpinalContext,
+  SpinalNode,
+  SpinalGraphService,
+} from 'spinal-env-viewer-graph-service';
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
-import { serviceTicketPersonalized } from 'spinal-service-ticket'
-module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
+import { serviceTicketPersonalized } from 'spinal-service-ticket';
+module.exports = function (
+  logger,
+  app: express.Express,
+  spinalAPIMiddleware: spinalAPIMiddleware
+) {
   /**
-* @swagger
-* /api/v1/node/{id}/ticket_list:
-*   get:
-*     security: 
-*       - OauthSecurity: 
-*         - readOnly
-*     description: Returns list of tickets object
-*     summary: Get list of tickets object
-*     tags:
-*       - Nodes
-*     parameters:
-*      - in: path
-*        name: id
-*        description: use the dynamic ID
-*        required: true
-*        schema:
-*          type: integer
-*          format: int64
-*     responses:
-*       200:
-*         description: Success
-*         content:
-*           application/json:
-*             schema: 
-*               type: array
-*               items: 
-*                $ref: '#/components/schemas/Ticket'
-*       400:
-*         description: Bad request
-*/
-  app.get("/api/v1/node/:id/ticket_list", async (req, res, next) => {
-    let nodes = []
+   * @swagger
+   * /api/v1/node/{id}/ticket_list:
+   *   get:
+   *     security:
+   *       - OauthSecurity:
+   *         - readOnly
+   *     description: Returns list of tickets object
+   *     summary: Get list of tickets object
+   *     tags:
+   *       - Nodes
+   *     parameters:
+   *      - in: path
+   *        name: id
+   *        description: use the dynamic ID
+   *        required: true
+   *        schema:
+   *          type: integer
+   *          format: int64
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                $ref: '#/components/schemas/Ticket'
+   *       400:
+   *         description: Bad request
+   */
+  app.get('/api/v1/node/:id/ticket_list', async (req, res, next) => {
+    let nodes = [];
     try {
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(
+        parseInt(req.params.id, 10)
+      );
       //@ts-ignore
-      SpinalGraphService._addNode(node)
+      SpinalGraphService._addNode(node);
 
-      var ticketList = await serviceTicketPersonalized.getTicketsFromNode(node.getId().get());
-      for (let index = 0; index < ticketList.length; index++) {
-        var realNodeTicket = SpinalGraphService.getRealNode(ticketList[index].id)
+      var ticketList = await node.getChildren(
+        'SpinalSystemServiceTicketHasTicket'
+      );
+      for (const ticket of ticketList) {
+        //context && workflow
+        const workflow = SpinalGraphService.getRealNode(
+          ticket.getContextIds()[0]
+        );
+
+        //Step
+        let _step = await ticket
+          .getParents('SpinalSystemServiceTicketHasTicket')
+          .then((steps) => {
+            for (const step of steps) {
+              if (
+                step.getType().get() === 'SpinalSystemServiceTicketTypeStep'
+              ) {
+                return step;
+              }
+            }
+          });
+        let _process = await _step
+          .getParents('SpinalSystemServiceTicketHasStep')
+          .then((processes) => {
+            for (const process of processes) {
+              if (process.getType().get() === 'SpinalServiceTicketProcess') {
+                return process;
+              }
+            }
+          });
         var info = {
-          dynamicId: realNodeTicket._server_id,
-          staticId: ticketList[index].id,
-          name: ticketList[index].name,
-          type: ticketList[index].type,
-        }
+          dynamicId: ticket._server_id,
+          staticId: ticket.getId().get(),
+          name: ticket.getName().get(),
+          type: ticket.getType().get(),
+          priority: ticket.info.priority.get(),
+          creationDate: ticket.info.creationDate.get(),
+          userName:
+            ticket.info.user == undefined ? '' : ticket.info.user.name.get(),
+          gmaoId:
+            ticket.info.gmaoId == undefined ? '' : ticket.info.gmaoId.get(),
+          gmaoDateCreation:
+            ticket.info.gmaoDateCreation == undefined
+              ? ''
+              : ticket.info.gmaoDateCreation.get(),
+          description:
+            ticket.info.description == undefined
+              ? ''
+              : ticket.info.description.get(),
+          declarer_id:
+            ticket.info.declarer_id == undefined
+              ? ''
+              : ticket.info.declarer_id.get(),
+          process: {
+            dynamicId: _process._server_id,
+            staticId: _process.getId().get(),
+            name: _process.getName().get(),
+            type: _process.getType().get(),
+          },
+          step: {
+            dynamicId: _step._server_id,
+            staticId: _step.getId().get(),
+            name: _step.getName().get(),
+            type: _step.getType().get(),
+            color: _step.info.color.get(),
+            order: _step.info.order.get(),
+          },
+          workflowId: workflow._server_id,
+          workflowName: workflow.getName().get(),
+        };
         nodes.push(info);
       }
     } catch (error) {
       console.log(error);
-      res.status(400).send("ko");
+      res.status(400).send('ko');
     }
     res.json(nodes);
-  })
-}
+  });
+};

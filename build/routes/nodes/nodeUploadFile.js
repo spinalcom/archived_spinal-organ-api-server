@@ -33,46 +33,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
-const FileExplorer_js_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/FileExplorer.js");
+const spinal_env_viewer_plugin_documentation_service_1 = require("spinal-env-viewer-plugin-documentation-service");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-    * @swagger
-    * /api/v1/node/{id}/upload_file:
-    *   post:
-    *     security:
-    *       - OauthSecurity:
-    *         - read
-    *     description: Upload a Doc
-    *     summary: Upload a Doc
-    *     tags:
-    *       - Nodes
-    *     parameters:
-    *      - in: path
-    *        name: id
-    *        description: use the dynamic ID
-    *        required: true
-    *        schema:
-    *          type: integer
-    *          format: int64
-    *     requestBody:
-    *       content:
-    *         multipart/form-data:
-    *           schema:
-    *             type: object
-    *             properties:
-    *               file:
-    *                 type: string
-    *                 format: binary
-    *           encoding:
-    *             file:
-    *               style: form
-    *     responses:
-    *       200:
-    *         description: Upload Successfully
-    *       400:
-    *         description: Upload not Successfully
-    */
-    app.post("/api/v1/node/:id/upload_file", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+     * @swagger
+     * /api/v1/node/{id}/upload_file:
+     *   post:
+     *     security:
+     *       - OauthSecurity:
+     *         - read
+     *     description: Upload a Doc
+     *     summary: Upload a Doc
+     *     tags:
+     *       - Nodes
+     *     parameters:
+     *      - in: path
+     *        name: id
+     *        description: use the dynamic ID
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          format: int64
+     *     requestBody:
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               file:
+     *                 type: string
+     *                 format: binary
+     *           encoding:
+     *             file:
+     *               style: form
+     *     responses:
+     *       200:
+     *         description: Upload Successfully
+     *       400:
+     *         description: Upload not Successfully
+     */
+    app.post('/api/v1/node/:id/upload_file', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
             //@ts-ignore
@@ -81,7 +81,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             if (!req.files) {
                 res.send({
                     status: false,
-                    message: 'No file uploaded'
+                    message: 'No file uploaded',
                 });
             }
             else {
@@ -89,15 +89,17 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 // @ts-ignore
                 let file = req.files.file;
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
-                file.mv('./uploads/' + file.name);
-                var user = { username: "string", userId: 0 };
+                // file.mv('./uploads/' + file.name);
+                // var user = { username: "string", userId: 0 }
                 var data = {
                     name: file.name,
-                    mimetype: file.mimetype,
-                    size: file.size
+                    buffer: file.data,
+                    // mimetype: file.mimetype,
+                    // size: file.size
                 };
-                let directory = yield FileExplorer_js_1.FileExplorer.getDirectory(node);
-                yield FileExplorer_js_1.FileExplorer.addFileUpload(directory, file);
+                yield spinal_env_viewer_plugin_documentation_service_1.FileExplorer.uploadFiles(node, data);
+                // let directory = await FileExplorer.getDirectory(node);
+                // await FileExplorer.addFileUpload(directory, file)
                 //send response
                 res.send({
                     status: true,
@@ -105,14 +107,14 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     data: {
                         name: file.name,
                         mimetype: file.mimetype,
-                        size: file.size
-                    }
+                        size: file.size,
+                    },
                 });
             }
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
         // res.json();
     }));

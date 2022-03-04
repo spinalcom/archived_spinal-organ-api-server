@@ -37,50 +37,50 @@ const findOneInContext_1 = require("../../utilities/findOneInContext");
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-   * @swagger
-   * /api/v1/find_node_in_context:
-   *   post:
-   *     security:
-   *       - OauthSecurity:
-   *         - readOnly
-   *     description: Find node object in a specific context
-   *     summary: Gets Node
-   *     tags:
-   *      - Contexts/ontologies
-   *     requestBody:
-   *       description: (optionSearchNodes) this field takes a string that allows us to search either by dynamicId, the staticId or by name, (dynamicId), (staticId), (name) / (optionResult) this field takes a string that allows us to choose the type of result / either a standard result, or a detailed result by putting the type of the node.(standard) / (type of node (example = Ticket)) (context) this field takes a string either the name of the context, the dynamicId or the staticId / (array) this field takes a list of strings according to your choice of fields (optionNodes from research)
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             required:
-   *               - optionSearchNodes
-   *               - optionResult
-   *               - context
-   *               - array
-   *             properties:
-   *               optionSearchNodes:
-   *                 type: string
-   *               optionResult:
-   *                 type: string
-   *               context:
-   *                 type: string
-   *               array:
-   *                 type: array
-   *                 items:
-   *                   type: string
-   *     responses:
-   *       200:
-   *         description: Success
-   *         content:
-   *           application/json:
-   *             schema:
-   *                $ref: '#/components/schemas/Node'
-   *       400:
-   *         description: Bad request
-    */
-    app.post("/api/v1/find_node_in_context", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+     * @swagger
+     * /api/v1/find_node_in_context:
+     *   post:
+     *     security:
+     *       - OauthSecurity:
+     *         - readOnly
+     *     description: Find node object in a specific context
+     *     summary: Gets Node
+     *     tags:
+     *      - Contexts/ontologies
+     *     requestBody:
+     *       description: (optionSearchNodes) this field takes a string that allows us to search either by dynamicId, the staticId or by name, (dynamicId), (staticId), (name) / (optionResult) this field takes a string that allows us to choose the type of result / either a standard result, or a detailed result by putting the type of the node.(standard) / (type of node (example = ticket)) (context) this field takes a string either the name of the context, the dynamicId or the staticId / (array) this field takes a list of strings according to your choice of fields (optionNodes from research)
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - optionSearchNodes
+     *               - optionResult
+     *               - context
+     *               - array
+     *             properties:
+     *               optionSearchNodes:
+     *                 type: string
+     *               optionResult:
+     *                 type: string
+     *               context:
+     *                 type: string
+     *               array:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *     responses:
+     *       200:
+     *         description: Success
+     *         content:
+     *           application/json:
+     *             schema:
+     *                $ref: '#/components/schemas/Node'
+     *       400:
+     *         description: Bad request
+     */
+    app.post('/api/v1/find_node_in_context', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             var info;
             const tab = req.body.array;
@@ -90,22 +90,22 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             /**********************context************************/
             function verifyContext(paramContext) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (typeof spinal_core_connectorjs_type_1.FileSystem._objects[paramContext] !== "undefined") {
-                        return context = yield spinalAPIMiddleware.load(parseInt(paramContext, 10));
+                    if (typeof spinal_core_connectorjs_type_1.FileSystem._objects[paramContext] !== 'undefined') {
+                        return (context = yield spinalAPIMiddleware.load(parseInt(paramContext, 10)));
                     }
                     else if (spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(paramContext)) {
-                        return context = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(paramContext);
+                        return (context = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(paramContext));
                     }
                     else if (spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(paramContext)) {
-                        return context = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(paramContext);
+                        return (context = spinal_env_viewer_graph_service_1.SpinalGraphService.getContext(paramContext));
                     }
                     else {
-                        res.status(400).send("context not exist");
+                        res.status(400).send('context not exist');
                     }
                 });
             }
             /***************** ***optionSearchNodes**************/
-            if (req.body.optionSearchNodes === "dynamicId") {
+            if (req.body.optionSearchNodes === 'dynamicId') {
                 let nodes = [];
                 for (let index = 0; index < tab.length; index++) {
                     let node = yield spinalAPIMiddleware.load(parseInt(tab[index], 10));
@@ -113,18 +113,23 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 }
                 for (const _node of nodes) {
                     if (_node.belongsToContext(context)) {
-                        if (req.body.optionResult === "ticket") {
+                        if (req.body.optionResult === 'ticket') {
                             //Step
-                            let _step = yield _node.getParents("SpinalSystemServiceTicketHasTicket").then((steps) => {
+                            let _step = yield _node
+                                .getParents('SpinalSystemServiceTicketHasTicket')
+                                .then((steps) => {
                                 for (const step of steps) {
-                                    if (step.getType().get() === "SpinalSystemServiceTicketTypeStep") {
+                                    if (step.getType().get() ===
+                                        'SpinalSystemServiceTicketTypeStep') {
                                         return step;
                                     }
                                 }
                             });
-                            let _process = yield _step.getParents("SpinalSystemServiceTicketHasStep").then((processes) => {
+                            let _process = yield _step
+                                .getParents('SpinalSystemServiceTicketHasStep')
+                                .then((processes) => {
                                 for (const process of processes) {
-                                    if (process.getType().get() === "SpinalServiceTicketProcess") {
+                                    if (process.getType().get() === 'SpinalServiceTicketProcess') {
                                         return process;
                                     }
                                 }
@@ -146,15 +151,27 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                 type: _node.getType().get(),
                                 priority: _node.info.priority.get(),
                                 creationDate: _node.info.creationDate.get(),
-                                elementSelected: elementSelected == undefined ? 0 : {
-                                    dynamicId: elementSelected._server_id,
-                                    staticId: elementSelected.getId().get(),
-                                    name: elementSelected.getName().get(),
-                                    type: elementSelected.getType().get(),
-                                },
-                                userName: _node.info.user == undefined ? "" : _node.info.user.name.get(),
-                                gmaoId: _node.info.gmaoId == undefined ? "" : _node.info.gmaoId.get(),
-                                gmaoDateCreation: _node.info.gmaoDateCreation == undefined ? "" : _node.info.gmaoDateCreation.get(),
+                                elementSelected: elementSelected == undefined
+                                    ? 0
+                                    : {
+                                        dynamicId: elementSelected._server_id,
+                                        staticId: elementSelected.getId().get(),
+                                        name: elementSelected.getName().get(),
+                                        type: elementSelected.getType().get(),
+                                    },
+                                userName: _node.info.user == undefined
+                                    ? ''
+                                    : _node.info.user.name.get(),
+                                gmaoId: _node.info.gmaoId == undefined ? '' : _node.info.gmaoId.get(),
+                                gmaoDateCreation: _node.info.gmaoDateCreation == undefined
+                                    ? ''
+                                    : _node.info.gmaoDateCreation.get(),
+                                description: _node.info.description == undefined
+                                    ? ''
+                                    : _node.info.description.get(),
+                                declarer_id: _node.info.declarer_id == undefined
+                                    ? ''
+                                    : _node.info.declarer_id.get(),
                                 process: {
                                     dynamicId: _process._server_id,
                                     staticId: _process.getId().get(),
@@ -170,7 +187,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                     order: _step.info.order.get(),
                                 },
                                 workflowId: context._server_id,
-                                workflowName: context.getName().get()
+                                workflowName: context.getName().get(),
                             };
                             result.push(info);
                         }
@@ -185,32 +202,38 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         }
                     }
                     else
-                        res.status(400).send("one of node not exist in this context");
+                        res.status(400).send('one of node not exist in this context');
                 }
             }
-            else if (req.body.optionSearchNodes === "staticId") {
+            else if (req.body.optionSearchNodes === 'staticId') {
                 let nodes = [];
                 for (let index = 0; index < tab.length; index++) {
                     let node = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(tab[index]);
-                    if (typeof node === "undefined") {
+                    if (typeof node === 'undefined') {
                         node = yield (0, findOneInContext_1.findOneInContext)(context, context, (n) => n.getId().get() === tab[index]);
                     }
                     nodes.push(node);
                 }
                 for (const _node of nodes) {
-                    if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext && _node.belongsToContext(context)) {
-                        if (req.body.optionResult === "ticket") {
+                    if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext &&
+                        _node.belongsToContext(context)) {
+                        if (req.body.optionResult === 'ticket') {
                             //Step
-                            let _step = yield _node.getParents("SpinalSystemServiceTicketHasTicket").then((steps) => {
+                            let _step = yield _node
+                                .getParents('SpinalSystemServiceTicketHasTicket')
+                                .then((steps) => {
                                 for (const step of steps) {
-                                    if (step.getType().get() === "SpinalSystemServiceTicketTypeStep") {
+                                    if (step.getType().get() ===
+                                        'SpinalSystemServiceTicketTypeStep') {
                                         return step;
                                     }
                                 }
                             });
-                            let _process = yield _step.getParents("SpinalSystemServiceTicketHasStep").then((processes) => {
+                            let _process = yield _step
+                                .getParents('SpinalSystemServiceTicketHasStep')
+                                .then((processes) => {
                                 for (const process of processes) {
-                                    if (process.getType().get() === "SpinalServiceTicketProcess") {
+                                    if (process.getType().get() === 'SpinalServiceTicketProcess') {
                                         return process;
                                     }
                                 }
@@ -232,15 +255,27 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                 type: _node.getType().get(),
                                 priority: _node.info.priority.get(),
                                 creationDate: _node.info.creationDate.get(),
-                                elementSelected: elementSelected == undefined ? 0 : {
-                                    dynamicId: elementSelected._server_id,
-                                    staticId: elementSelected.getId().get(),
-                                    name: elementSelected.getName().get(),
-                                    type: elementSelected.getType().get(),
-                                },
-                                userName: _node.info.user == undefined ? "" : _node.info.user.name.get(),
-                                gmaoId: _node.info.gmaoId == undefined ? "" : _node.info.gmaoId.get(),
-                                gmaoDateCreation: _node.info.gmaoDateCreation == undefined ? "" : _node.info.gmaoDateCreation.get(),
+                                elementSelected: elementSelected == undefined
+                                    ? 0
+                                    : {
+                                        dynamicId: elementSelected._server_id,
+                                        staticId: elementSelected.getId().get(),
+                                        name: elementSelected.getName().get(),
+                                        type: elementSelected.getType().get(),
+                                    },
+                                userName: _node.info.user == undefined
+                                    ? ''
+                                    : _node.info.user.name.get(),
+                                gmaoId: _node.info.gmaoId == undefined ? '' : _node.info.gmaoId.get(),
+                                gmaoDateCreation: _node.info.gmaoDateCreation == undefined
+                                    ? ''
+                                    : _node.info.gmaoDateCreation.get(),
+                                description: _node.info.description == undefined
+                                    ? ''
+                                    : _node.info.description.get(),
+                                declarer_id: _node.info.declarer_id == undefined
+                                    ? ''
+                                    : _node.info.declarer_id.get(),
                                 process: {
                                     dynamicId: _process._server_id,
                                     staticId: _process.getId().get(),
@@ -256,7 +291,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                     order: _step.info.order.get(),
                                 },
                                 workflowId: context._server_id,
-                                workflowName: context.getName().get()
+                                workflowName: context.getName().get(),
                             };
                             result.push(info);
                         }
@@ -271,31 +306,37 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         }
                     }
                     else
-                        res.status(400).send("one of node not exist in this context");
+                        res.status(400).send('one of node not exist in this context');
                 }
             }
-            else if (req.body.optionSearchNodes === "name") {
+            else if (req.body.optionSearchNodes === 'name') {
                 if (context) {
                     let res = yield spinal_env_viewer_graph_service_1.SpinalGraphService.findInContext(context.getId().get(), context.getId().get());
                     for (const _node of res) {
                         for (const _name of tab) {
                             if (_node.name.get() === _name) {
                                 let node = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(_node.id.get());
-                                if (typeof node === "undefined") {
+                                if (typeof node === 'undefined') {
                                     node = yield (0, findOneInContext_1.findOneInContext)(context, context, (n) => n.getId().get() === _node.id.get());
                                 }
-                                if (req.body.optionResult === "ticket") {
+                                if (req.body.optionResult === 'ticket') {
                                     //Step
-                                    let _step = yield node.getParents("SpinalSystemServiceTicketHasTicket").then((steps) => {
+                                    let _step = yield node
+                                        .getParents('SpinalSystemServiceTicketHasTicket')
+                                        .then((steps) => {
                                         for (const step of steps) {
-                                            if (step.getType().get() === "SpinalSystemServiceTicketTypeStep") {
+                                            if (step.getType().get() ===
+                                                'SpinalSystemServiceTicketTypeStep') {
                                                 return step;
                                             }
                                         }
                                     });
-                                    let _process = yield _step.getParents("SpinalSystemServiceTicketHasStep").then((processes) => {
+                                    let _process = yield _step
+                                        .getParents('SpinalSystemServiceTicketHasStep')
+                                        .then((processes) => {
                                         for (const process of processes) {
-                                            if (process.getType().get() === "SpinalServiceTicketProcess") {
+                                            if (process.getType().get() ===
+                                                'SpinalServiceTicketProcess') {
                                                 return process;
                                             }
                                         }
@@ -311,21 +352,35 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                         console.error(error);
                                     }
                                     info = {
-                                        dynamicId: node._server_id,
-                                        staticId: node.getId().get(),
-                                        name: node.getName().get(),
-                                        type: node.getType().get(),
-                                        priority: node.info.priority.get(),
-                                        creationDate: node.info.creationDate.get(),
-                                        elementSelected: elementSelected == undefined ? 0 : {
-                                            dynamicId: elementSelected._server_id,
-                                            staticId: elementSelected.getId().get(),
-                                            name: elementSelected.getName().get(),
-                                            type: elementSelected.getType().get(),
-                                        },
-                                        userName: node.info.user == undefined ? "" : node.info.user.name.get(),
-                                        gmaoId: node.info.gmaoId == undefined ? "" : node.info.gmaoId.get(),
-                                        gmaoDateCreation: node.info.gmaoDateCreation == undefined ? "" : node.info.gmaoDateCreation.get(),
+                                        dynamicId: _node._server_id,
+                                        staticId: _node.getId().get(),
+                                        name: _node.getName().get(),
+                                        type: _node.getType().get(),
+                                        priority: _node.info.priority.get(),
+                                        creationDate: _node.info.creationDate.get(),
+                                        elementSelected: elementSelected == undefined
+                                            ? 0
+                                            : {
+                                                dynamicId: elementSelected._server_id,
+                                                staticId: elementSelected.getId().get(),
+                                                name: elementSelected.getName().get(),
+                                                type: elementSelected.getType().get(),
+                                            },
+                                        userName: _node.info.user == undefined
+                                            ? ''
+                                            : _node.info.user.name.get(),
+                                        gmaoId: _node.info.gmaoId == undefined
+                                            ? ''
+                                            : _node.info.gmaoId.get(),
+                                        gmaoDateCreation: _node.info.gmaoDateCreation == undefined
+                                            ? ''
+                                            : _node.info.gmaoDateCreation.get(),
+                                        description: _node.info.description == undefined
+                                            ? ''
+                                            : _node.info.description.get(),
+                                        declarer_id: _node.info.declarer_id == undefined
+                                            ? ''
+                                            : _node.info.declarer_id.get(),
                                         process: {
                                             dynamicId: _process._server_id,
                                             staticId: _process.getId().get(),
@@ -341,7 +396,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                                             order: _step.info.order.get(),
                                         },
                                         workflowId: context._server_id,
-                                        workflowName: context.getName().get()
+                                        workflowName: context.getName().get(),
                                     };
                                     result.push(info);
                                 }
@@ -362,7 +417,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
         res.json(result);
     }));

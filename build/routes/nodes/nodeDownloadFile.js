@@ -32,44 +32,62 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+var http = require('http');
+var fs = require('fs');
+const config_1 = require("../../../config");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-   * @swagger
-   * /api/v1/node/{id}/download_file:
-   *   post:
-   *     security:
-   *       - OauthSecurity:
-   *         - read
-   *     description: Download a Doc
-   *     summary: Download a Doc
-   *     tags:
-   *       - Nodes
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         description: use the dynamic ID
-   *         required: true
-   *         schema:
-   *           type: integer
-   *           format: int64
-   *     responses:
-   *       200:
-   *         description: Download Successfully
-   *       400:
-   *         description: Download not Successfully
+     * @swagger
+     * /api/v1/node/{id}/download_file:
+     *   post:
+     *     security:
+     *       - OauthSecurity:
+     *         - read
+     *     description: Download a Doc
+     *     summary: Download a Doc
+     *     tags:
+     *       - Nodes
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         description: use the dynamic ID
+     *         required: true
+     *         schema:
+     *           type: integer
+     *           format: int64
+     *     responses:
+     *       200:
+     *         description: Download Successfully
+     *       400:
+     *         description: Download not Successfully
      */
-    app.post("/api/v1/node/:id/download_file", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    app.use('/api/v1/node/:id/download_file', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
-            //@ts-ignore
-            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
+            var p = yield down(node);
+            res.download(p, (error) => { });
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
-        // res.json();
     }));
 };
+function down(node) {
+    return new Promise((resolve, reject) => {
+        node.load((argPath) => {
+            const p = `${__dirname}/${node.name.get()}`;
+            const f = fs.createWriteStream(p);
+            http.get(`http://${config_1.default.spinalConnector.host}:${config_1.default.spinalConnector.port}/sceen/_?u=${argPath._server_id}`, function (response) {
+                response.pipe(f);
+                response.on('end', () => __awaiter(this, void 0, void 0, function* () {
+                    resolve(p);
+                }));
+                response.on('error', function (err) {
+                    console.log(err);
+                });
+            });
+        });
+    });
+}
 //# sourceMappingURL=nodeDownloadFile.js.map

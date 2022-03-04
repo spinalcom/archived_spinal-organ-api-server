@@ -35,94 +35,102 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_env_viewer_plugin_documentation_service_1 = require("spinal-env-viewer-plugin-documentation-service");
 const spinal_service_ticket_1 = require("spinal-service-ticket");
-const getFiles_1 = require("../../../utilities/getFiles");
 const Constants_1 = require("spinal-service-ticket/dist/Constants");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-   * @swagger
-   * /api/v1/ticket/{ticketId}/read_details:
-   *   get:
-   *     security:
-   *       - OauthSecurity:
-   *         - readOnly
-   *     description: Return ticket
-   *     summary: Get ticket
-   *     tags:
-   *       - Workflow & ticket
-   *     parameters:
-   *      - in: path
-   *        name: ticketId
-   *        description: use the dynamic ID
-   *        required: true
-   *        schema:
-   *          type: integer
-   *          format: int64
-   *     responses:
-   *       200:
-   *         description: Success
-   *         content:
-   *           application/json:
-   *             schema:
-   *                $ref: '#/components/schemas/TicketDetails'
-   *       400:
-   *         description: Bad request
-  */
-    app.get("/api/v1/ticket/:ticketId/read_details", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+     * @swagger
+     * /api/v1/ticket/{ticketId}/read_details:
+     *   get:
+     *     security:
+     *       - OauthSecurity:
+     *         - readOnly
+     *     description: Return ticket
+     *     summary: Get ticket
+     *     tags:
+     *       - Workflow & ticket
+     *     parameters:
+     *      - in: path
+     *        name: ticketId
+     *        description: use the dynamic ID
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          format: int64
+     *     responses:
+     *       200:
+     *         description: Success
+     *         content:
+     *           application/json:
+     *             schema:
+     *                $ref: '#/components/schemas/TicketDetails'
+     *       400:
+     *         description: Bad request
+     */
+    app.get('/api/v1/ticket/:ticketId/read_details', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             var _ticket = yield spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10));
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(_ticket);
             //Step
-            var _step = yield _ticket.getParents("SpinalSystemServiceTicketHasTicket").then((steps) => {
+            var _step = yield _ticket
+                .getParents('SpinalSystemServiceTicketHasTicket')
+                .then((steps) => {
                 for (const step of steps) {
-                    if (step.getType().get() === "SpinalSystemServiceTicketTypeStep") {
+                    if (step.getType().get() === 'SpinalSystemServiceTicketTypeStep') {
                         return step;
                     }
                 }
             });
-            var _process = yield _step.getParents("SpinalSystemServiceTicketHasStep").then((processes) => {
+            var _process = yield _step
+                .getParents('SpinalSystemServiceTicketHasStep')
+                .then((processes) => {
                 for (const process of processes) {
-                    if (process.getType().get() === "SpinalServiceTicketProcess") {
+                    if (process.getType().get() === 'SpinalServiceTicketProcess') {
                         return process;
                     }
                 }
             });
             //Context
-            var contextRealNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode((_ticket.getContextIds())[0]);
+            var contextRealNode = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(_ticket.getContextIds()[0]);
             // Notes
             var notes = yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.getNotes(_ticket);
             var _notes = [];
             for (const note of notes) {
                 let infoNote = {
-                    userName: note.element.username === undefined ? "" : note.element.username.get(),
+                    userName: note.element.username === undefined
+                        ? ''
+                        : note.element.username.get(),
                     date: note.element.date.get(),
                     type: note.element.type.get(),
-                    message: note.element.message.get()
+                    message: note.element.message.get(),
                 };
                 _notes.push(infoNote);
             }
             // Files
-            var files = yield (0, getFiles_1.default)(_ticket);
             var _files = [];
-            for (const file of files) {
-                let infoFiles = {
-                    Name: file.fileName,
-                    fileId: file.targetServerId
-                };
-                _files.push(infoFiles);
+            var fileNode = (yield _ticket.getChildren('hasFiles'))[0];
+            if (fileNode) {
+                var filesfromElement = yield fileNode.element.load();
+                for (let index = 0; index < filesfromElement.length; index++) {
+                    let infoFiles = {
+                        dynamicId: filesfromElement[index]._server_id,
+                        Name: filesfromElement[index].name.get(),
+                    };
+                    _files.push(infoFiles);
+                }
             }
             // Logs
             function formatEvent(log) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    var texte = "";
+                    var texte = '';
                     if (log.event == Constants_1.LOGS_EVENTS.creation) {
-                        texte = "created";
+                        texte = 'created';
                     }
                     else if (log.event == Constants_1.LOGS_EVENTS.archived) {
-                        texte = "archived";
+                        texte = 'archived';
                     }
                     else if (log.event == Constants_1.LOGS_EVENTS.unarchive) {
-                        texte = "unarchived";
+                        texte = 'unarchived';
                     }
                     else {
                         const promises = log.steps.map((el) => spinal_env_viewer_graph_service_1.SpinalGraphService.getNodeAsync(el));
@@ -147,7 +155,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     userName: log.user.name,
                     date: log.creationDate,
                     event: yield formatEvent(log),
-                    ticketStaticId: log.ticketId
+                    ticketStaticId: log.ticketId,
                 };
                 _logs.push(infoLogs);
             }
@@ -168,15 +176,25 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 type: _ticket.getType().get(),
                 priority: _ticket.info.priority.get(),
                 creationDate: _ticket.info.creationDate.get(),
-                elementSelected: elementSelected == undefined ? 0 : {
-                    dynamicId: elementSelected._server_id,
-                    staticId: elementSelected.getId().get(),
-                    name: elementSelected.getName().get(),
-                    type: elementSelected.getType().get(),
-                },
-                userName: _ticket.info.user == undefined ? "" : _ticket.info.user.name.get(),
-                gmaoId: _ticket.info.gmaoId == undefined ? "" : _ticket.info.gmaoId.get(),
-                gmaoDateCreation: _ticket.info.gmaoDateCreation == undefined ? "" : _ticket.info.gmaoDateCreation.get(),
+                description: _ticket.info.description == undefined
+                    ? ''
+                    : _ticket.info.description.get(),
+                declarer_id: _ticket.info.declarer_id == undefined
+                    ? ''
+                    : _ticket.info.declarer_id.get(),
+                elementSelected: elementSelected == undefined
+                    ? 0
+                    : {
+                        dynamicId: elementSelected._server_id,
+                        staticId: elementSelected.getId().get(),
+                        name: elementSelected.getName().get(),
+                        type: elementSelected.getType().get(),
+                    },
+                userName: _ticket.info.user == undefined ? '' : _ticket.info.user.name.get(),
+                gmaoId: _ticket.info.gmaoId == undefined ? '' : _ticket.info.gmaoId.get(),
+                gmaoDateCreation: _ticket.info.gmaoDateCreation == undefined
+                    ? ''
+                    : _ticket.info.gmaoDateCreation.get(),
                 process: {
                     dynamicId: _process._server_id,
                     staticId: _process.getId().get(),
@@ -195,12 +213,12 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 workflowName: contextRealNode.getName().get(),
                 annotation_list: _notes,
                 file_list: _files,
-                log_list: _logs
+                log_list: _logs,
             };
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
         res.json(info);
     }));

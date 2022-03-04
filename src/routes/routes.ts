@@ -22,10 +22,9 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import * as express from 'express'
+import * as express from 'express';
 import { read } from 'fs';
 function routes(logger, app: express.Express, spinalAPIMiddleware) {
-
   //contexts routes
 
   require('./contexts/contextList')(logger, app, spinalAPIMiddleware);
@@ -38,7 +37,11 @@ function routes(logger, app: express.Express, spinalAPIMiddleware) {
   //nodes routes in specific context
   require('./contexts/nodeTreeInContext')(logger, app, spinalAPIMiddleware);
   // require('./contexts/contextNodeTypeListOfNode')(logger, app, spinalAPIMiddleware);
-  require('./contexts/contextNodesOfTypeFornode')(logger, app, spinalAPIMiddleware);
+  require('./contexts/contextNodesOfTypeFornode')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./contexts/findInContext')(logger, app, spinalAPIMiddleware);
   require('./contexts/contextFindNodeByDate')(logger, app, spinalAPIMiddleware);
 
@@ -64,17 +67,48 @@ function routes(logger, app: express.Express, spinalAPIMiddleware) {
   require('./attributs/deleteAttribute')(logger, app, spinalAPIMiddleware);
 
   //categories routes
-  require('./categoriesAttributs/categoriesList')(logger, app, spinalAPIMiddleware);
-  require('./categoriesAttributs/createCategory')(logger, app, spinalAPIMiddleware);
+  require('./categoriesAttributs/categoriesList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./categoriesAttributs/createCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
-  require('./categoriesAttributs/deleteCategoryById')(logger, app, spinalAPIMiddleware);
-  require('./categoriesAttributs/updateCategoryById')(logger, app, spinalAPIMiddleware);
-  require('./categoriesAttributs/readCategoryById')(logger, app, spinalAPIMiddleware);
+  require('./categoriesAttributs/deleteCategoryById')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./categoriesAttributs/updateCategoryById')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./categoriesAttributs/readCategoryById')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
-  require('./categoriesAttributs/deleteCategoryByName')(logger, app, spinalAPIMiddleware);
-  require('./categoriesAttributs/updateCategoryByName')(logger, app, spinalAPIMiddleware);
-  require('./categoriesAttributs/readCategoryByName')(logger, app, spinalAPIMiddleware);
-
+  require('./categoriesAttributs/deleteCategoryByName')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./categoriesAttributs/updateCategoryByName')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./categoriesAttributs/readCategoryByName')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // scenes routes
   require('./BIM/scenes/list')(logger, app);
@@ -85,137 +119,470 @@ function routes(logger, app: express.Express, spinalAPIMiddleware) {
   require('./BIM/getBimObjectsInfo')(logger, app);
 
   // tickets routes
-  require('./tickets/workflows/createWorkflow')(logger, app, spinalAPIMiddleware);
-  require('./tickets/workflows/deleteWorkflow')(logger, app, spinalAPIMiddleware);
-  require('./tickets/workflows/updateWorkflow')(logger, app, spinalAPIMiddleware);
+  require('./tickets/workflows/createWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/workflows/deleteWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/workflows/updateWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./tickets/workflows/readWorkflow')(logger, app, spinalAPIMiddleware);
   require('./tickets/workflows/workflowList')(logger, app, spinalAPIMiddleware);
   require('./tickets/workflows/workflowTree')(logger, app, spinalAPIMiddleware);
-  require('./tickets/workflows/workflowTypeList')(logger, app, spinalAPIMiddleware);
-  require('./tickets/workflows/findNodeInWorkflow')(logger, app, spinalAPIMiddleware);
-  require('./tickets/workflows/readNodeInWorkflow')(logger, app, spinalAPIMiddleware);
+  require('./tickets/workflows/workflowTypeList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/workflows/findNodeInWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/workflows/readNodeInWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./tickets/process/processList')(logger, app, spinalAPIMiddleware);
   require('./tickets/process/createProcess')(logger, app, spinalAPIMiddleware);
   require('./tickets/process/deleteProcess')(logger, app, spinalAPIMiddleware);
   require('./tickets/process/updateProcess')(logger, app, spinalAPIMiddleware);
-  require('./tickets/steps/stepsListFromProcess')(logger, app, spinalAPIMiddleware);
+  require('./tickets/steps/stepsListFromProcess')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./tickets/steps/createStep')(logger, app, spinalAPIMiddleware);
   require('./tickets/steps/deleteStep')(logger, app, spinalAPIMiddleware);
   require('./tickets/steps/updateStep')(logger, app, spinalAPIMiddleware);
   // require('./tickets/tickets/ticketList')(logger, app, spinalAPIMiddleware);
   require('./tickets/tickets/createTicket')(logger, app, spinalAPIMiddleware);
   require('./tickets/tickets/ticketNextStep')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketPreviousStep')(logger, app, spinalAPIMiddleware);
+  require('./tickets/tickets/ticketPreviousStep')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./tickets/tickets/ticketAddNote')(logger, app, spinalAPIMiddleware);
   require('./tickets/tickets/ticketAddDoc')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketUnarchive')(logger, app, spinalAPIMiddleware);
+  require('./tickets/tickets/ticketUnarchive')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./tickets/tickets/ticketArchive')(logger, app, spinalAPIMiddleware);
   require('./tickets/tickets/readTicket')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketChangeProcess')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketChangeWorkflow')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketChangeNode')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketFindEntity')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketEventList')(logger, app, spinalAPIMiddleware);
-  require('./tickets/tickets/ticketCreateEvent')(logger, app, spinalAPIMiddleware);
+  require('./tickets/tickets/ticketChangeProcess')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/tickets/ticketChangeWorkflow')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/tickets/ticketChangeNode')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/tickets/ticketFindEntity')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/tickets/ticketEventList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./tickets/tickets/ticketCreateEvent')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   //endPoints routes
-  require('./IoTNetwork/IoTNetworkContext/IoTNetworkList')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/createIotNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/deleteIoTNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/updateIoTNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/IoTNetworkTree')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/findNodeInIoTNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/readNodeInIoTNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/IoTNetworkContext/IoTNetworkTypeList')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/BmsNetwork/createBmsNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/BmsNetwork/bmsNetworkList')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/BmsNetwork/deleteBmsNetwork')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/BmsNetwork/updateBmsNetwork')(logger, app, spinalAPIMiddleware);
+  require('./IoTNetwork/IoTNetworkContext/IoTNetworkList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/createIotNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/deleteIoTNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/updateIoTNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/IoTNetworkTree')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/findNodeInIoTNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/readNodeInIoTNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/IoTNetworkContext/IoTNetworkTypeList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/BmsNetwork/createBmsNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/BmsNetwork/bmsNetworkList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/BmsNetwork/deleteBmsNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/BmsNetwork/updateBmsNetwork')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./IoTNetwork/device/deviceList')(logger, app, spinalAPIMiddleware);
   require('./IoTNetwork/device/createDevice')(logger, app, spinalAPIMiddleware);
   require('./IoTNetwork/device/deleteDevice')(logger, app, spinalAPIMiddleware);
   require('./IoTNetwork/device/updateDevice')(logger, app, spinalAPIMiddleware);
 
+  require('./IoTNetwork/endPoint/createEndPoint')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/endPoint/endointList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/endPoint/endpointAttributs')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/endPoint/readEndPointCurrentValue')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/endPoint/updateEndPointCurrentValue')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
-  require('./IoTNetwork/endPoint/createEndPoint')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/endPoint/endointList')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/endPoint/endpointAttributs')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/endPoint/readEndPointCurrentValue')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/endPoint/updateEndPointCurrentValue')(logger, app, spinalAPIMiddleware);
-
-
-  require('./IoTNetwork/timeSeries/readTimeSeries')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/readTimeSeriesFrom Last24H')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentDay')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentWeek')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentMonth')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentYear')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/pushTimeSeries')(logger, app, spinalAPIMiddleware);
-  require('./IoTNetwork/timeSeries/insertTimeSeries')(logger, app, spinalAPIMiddleware);
-
-
-
+  require('./IoTNetwork/timeSeries/readTimeSeries')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/readTimeSeriesFrom Last24H')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentDay')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentWeek')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentMonth')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/readTimeSeriesCurrentYear')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/pushTimeSeries')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./IoTNetwork/timeSeries/insertTimeSeries')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   //context geographique routes
-  require('./geographicContext/geographicContextTree')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/geographicContextSpace')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/building/readBuilding')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/floor/floorList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/floor/floorDetails')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/readRoom')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/floor/floorReferencesObjectsList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomEquipementList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomReferenceObjectsList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomNotes')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/readRoomDetails')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomEndPointList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomEndPointControlList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomTicketList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomEvent')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/roomFileList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/room/readStaticsDetails')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/readEquipement')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementEndpointControlList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementEndPoint')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementEvent')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementFileList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementNotes')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/equipement/equipementTicketList')(logger, app, spinalAPIMiddleware);
-  require('./geographicContext/getPositionNode')(logger, app, spinalAPIMiddleware);
+  require('./geographicContext/geographicContextTree')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/geographicContextSpace')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/building/readBuilding')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/floor/floorList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/floor/floorDetails')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/readRoom')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/floor/floorReferencesObjectsList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomEquipementList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomReferenceObjectsList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomNotes')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/readRoomDetails')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomEndPointList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomEndPointControlList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomTicketList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomEvent')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/roomFileList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/room/readStaticsDetails')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/readEquipement')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementEndpointControlList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementEndPoint')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementEvent')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementFileList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementNotes')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/equipement/equipementTicketList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./geographicContext/getPositionNode')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // calendar & Event
-  require('./calendar/EventContext/listEventContext')(logger, app, spinalAPIMiddleware);
-  require('./calendar/EventContext/EventContextTree')(logger, app, spinalAPIMiddleware);
-  require('./calendar/EventContext/createEventContext')(logger, app, spinalAPIMiddleware);
-  require('./calendar/eventCategories/listEventCatedory')(logger, app, spinalAPIMiddleware);
-  require('./calendar/eventCategories/createEventCategory')(logger, app, spinalAPIMiddleware);
-  require('./calendar/eventGroup/listEventGroup')(logger, app, spinalAPIMiddleware);
-  require('./calendar/eventGroup/createEventGroup')(logger, app, spinalAPIMiddleware);
+  require('./calendar/EventContext/listEventContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/EventContext/EventContextTree')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/EventContext/createEventContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/eventCategories/listEventCatedory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/eventCategories/createEventCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/eventGroup/listEventGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./calendar/eventGroup/createEventGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   // require('./calendar/Events/enventList')(logger, app, spinalAPIMiddleware);
   require('./calendar/Events/removeEvent')(logger, app, spinalAPIMiddleware);
   require('./calendar/Events/updateEvent')(logger, app, spinalAPIMiddleware);
   require('./calendar/Events/createEvent')(logger, app, spinalAPIMiddleware);
   require('./calendar/Events/readEvent')(logger, app, spinalAPIMiddleware);
 
-
-
   // group context
-  require('./groupContext/groupeContextTypeList')(logger, app, spinalAPIMiddleware);
+  require('./groupContext/groupeContextTypeList')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./groupContext/contextsOfType')(logger, app, spinalAPIMiddleware);
   // context CRUD
-  require('./groupContext/context/listGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/context/treeGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/context/createGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/context/updateGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/context/deleteGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/context/readGroupContext')(logger, app, spinalAPIMiddleware);
+  require('./groupContext/context/listGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/context/treeGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/context/createGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/context/updateGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/context/deleteGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/context/readGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   // category CRUD
-  require('./groupContext/category/listCategory')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/category/createCategory')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/category/updateCategory')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/category/deleteCategory')(logger, app, spinalAPIMiddleware);
-  require('./groupContext/category/readCategory')(logger, app, spinalAPIMiddleware);
+  require('./groupContext/category/listCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/category/createCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/category/updateCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/category/deleteCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./groupContext/category/readCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   // group CRUD
   require('./groupContext/group/listGroup')(logger, app, spinalAPIMiddleware);
   require('./groupContext/group/createGroup')(logger, app, spinalAPIMiddleware);
@@ -228,103 +595,330 @@ function routes(logger, app: express.Express, spinalAPIMiddleware) {
   // require('./notes/getnotes')(logger, app, spinalAPIMiddleware);
   require('./notes/updateNotes')(logger, app, spinalAPIMiddleware);
 
-
-
-
   // Rooms Group
   // Context
-  require('./roomGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/context/treeGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/context/createGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/context/deleteGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/context/readGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/context/updateGroupContext')(logger, app, spinalAPIMiddleware);
+  require('./roomGroup/context/listGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/context/treeGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/context/createGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/context/deleteGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/context/readGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/context/updateGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   // Category
-  require('./roomGroup/category/listCategory')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/category/createCategory')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/category/readCategory')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/category/updateCategory')(logger, app, spinalAPIMiddleware);
-  require('./roomGroup/category/deleteCategory')(logger, app, spinalAPIMiddleware);
+  require('./roomGroup/category/listCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/category/createCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/category/readCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/category/updateCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./roomGroup/category/deleteCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   //  Group
   require('./roomGroup/group/listGroup')(logger, app, spinalAPIMiddleware);
   require('./roomGroup/group/createGroup')(logger, app, spinalAPIMiddleware);
   require('./roomGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
   require('./roomGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
   require('./roomGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
+  require('./roomGroup/room/listRoom')(logger, app, spinalAPIMiddleware);
 
   // Rooms Group
   // Context
-  require('./endpointGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/context/treeGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/context/createGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/context/readGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/context/updateGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/context/deleteGroupContext')(logger, app, spinalAPIMiddleware);
+  require('./endpointGroup/context/listGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/context/treeGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/context/createGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/context/readGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/context/updateGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/context/deleteGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // Category
-  require('./endpointGroup/category/listCategory')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/category/createCategory')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/category/readCategory')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/category/updateCategory')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/category/deleteCategory')(logger, app, spinalAPIMiddleware);
+  require('./endpointGroup/category/listCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/category/createCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/category/readCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/category/updateCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/category/deleteCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // Group
   require('./endpointGroup/group/listGroup')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/group/createGroup')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
-  require('./endpointGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
+  require('./endpointGroup/group/createGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/group/updateGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./endpointGroup/group/deleteGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   require('./endpointGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
 
   // Equipements Group
   // Context
-  require('./equipementGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/context/treeGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/context/createGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/context/readGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/context/updateGroupContext')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/context/deleteGroupContext')(logger, app, spinalAPIMiddleware);
+  require('./equipementGroup/context/listGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/context/treeGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/context/createGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/context/readGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/context/updateGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/context/deleteGroupContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // Category
-  require('./equipementGroup/category/listCategory')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/category/createCategory')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/category/readCategory')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/category/updateCategory')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/category/deleteCategory')(logger, app, spinalAPIMiddleware);
+  require('./equipementGroup/category/listCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/category/createCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/category/readCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/category/updateCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/category/deleteCategory')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   // Group
-  require('./equipementGroup/group/listGroup')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/group/createGroup')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
-  require('./equipementGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
+  require('./equipementGroup/group/listGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/group/createGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/group/updateGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/group/deleteGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./equipementGroup/group/readGroup')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
   //endPoints routes
   // context nomenclature
-  require('./nomenclatureGroup/context/listContextNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/context/readNomenclatureContext')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/context/deleteNomenclatureContext')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/context/createNomenclatureContext')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/context/updateNomenclatureContext')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/context/treeNomenclatureContext')(logger, app, spinalAPIMiddleware);
+  require('./nomenclatureGroup/context/listContextNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/context/readNomenclatureContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/context/deleteNomenclatureContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/context/createNomenclatureContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/context/updateNomenclatureContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/context/treeNomenclatureContext')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   //category nomenclature
-  require('./nomenclatureGroup/category/listCategoryNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/category/createCategoryNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/category/readCategoryNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/category/updateCategoryNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/category/deleteCategoryNomenclature')(logger, app, spinalAPIMiddleware);
+  require('./nomenclatureGroup/category/listCategoryNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/category/createCategoryNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/category/readCategoryNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/category/updateCategoryNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/category/deleteCategoryNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
   //group nomenclature
-  require('./nomenclatureGroup/group/listGroupNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/group/createGroupNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/group/readGroupNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/group/updateGroupNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/group/deleteGroupNomenclature')(logger, app, spinalAPIMiddleware);
-  require('./nomenclatureGroup/nomenclature/listProfiles')(logger, app, spinalAPIMiddleware);
+  require('./nomenclatureGroup/group/listGroupNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/group/createGroupNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/group/readGroupNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/group/updateGroupNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/group/deleteGroupNomenclature')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
+  require('./nomenclatureGroup/nomenclature/listProfiles')(
+    logger,
+    app,
+    spinalAPIMiddleware
+  );
 
-
-
-  // Analytics 
+  // Analytics
   require('./analytics/roomResume')(logger, app, spinalAPIMiddleware);
-
 }
 
-export default routes
+export default routes;

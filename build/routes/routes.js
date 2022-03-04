@@ -220,6 +220,7 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./roomGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
     require('./roomGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
     require('./roomGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
+    require('./roomGroup/room/listRoom')(logger, app, spinalAPIMiddleware);
     // Rooms Group
     // Context
     require('./endpointGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
@@ -281,7 +282,7 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./nomenclatureGroup/group/updateGroupNomenclature')(logger, app, spinalAPIMiddleware);
     require('./nomenclatureGroup/group/deleteGroupNomenclature')(logger, app, spinalAPIMiddleware);
     require('./nomenclatureGroup/nomenclature/listProfiles')(logger, app, spinalAPIMiddleware);
-    // Analytics 
+    // Analytics
     require('./analytics/roomResume')(logger, app, spinalAPIMiddleware);
 }
 exports.default = routes;

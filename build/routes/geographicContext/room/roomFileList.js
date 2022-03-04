@@ -33,63 +33,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
-const getFiles_1 = require("../../../utilities/getFiles");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-   * @swagger
-   * /api/v1/room/{id}/file_list:
-   *   get:
-   *     security:
-   *       - OauthSecurity:
-   *         - readOnly
-   *     description: Returns files of room
-   *     summary: Get list files of room
-   *     tags:
-   *       - Geographic Context
-   *     parameters:
-   *      - in: path
-   *        name: id
-   *        description: use the dynamic ID
-   *        required: true
-   *        schema:
-   *          type: integer
-   *          format: int64
-   *     responses:
-   *       200:
-   *         description: Success
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: array
-   *               items:
-   *                $ref: '#/components/schemas/File'
-   *       400:
-   *         description: Bad request
-  */
-    app.get("/api/v1/room/:id/file_list", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+     * @swagger
+     * /api/v1/room/{id}/file_list:
+     *   get:
+     *     security:
+     *       - OauthSecurity:
+     *         - readOnly
+     *     description: Returns files of room
+     *     summary: Get list files of room
+     *     tags:
+     *       - Geographic Context
+     *     parameters:
+     *      - in: path
+     *        name: id
+     *        description: use the dynamic ID
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          format: int64
+     *     responses:
+     *       200:
+     *         description: Success
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                $ref: '#/components/schemas/File'
+     *       400:
+     *         description: Bad request
+     */
+    app.get('/api/v1/room/:id/file_list', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             var room = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(room);
-            if (room.getType().get() === "geographicRoom") {
+            if (room.getType().get() === 'geographicRoom') {
                 // Files
-                var files = yield (0, getFiles_1.default)(room);
                 var _files = [];
-                for (const file of files) {
-                    let infoFiles = {
-                        name: file.fileName,
-                        fileId: file.targetServerId
-                    };
-                    _files.push(infoFiles);
+                var fileNode = (yield room.getChildren('hasFiles'))[0];
+                if (fileNode) {
+                    var filesfromElement = yield fileNode.element.load();
+                    for (let index = 0; index < filesfromElement.length; index++) {
+                        let infoFiles = {
+                            dynamicId: filesfromElement[index]._server_id,
+                            Name: filesfromElement[index].name.get(),
+                        };
+                        _files.push(infoFiles);
+                    }
                 }
             }
             else {
-                res.status(400).send("node is not of type geographic room");
+                res.status(400).send('node is not of type geographic room');
             }
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
         res.json(_files);
     }));

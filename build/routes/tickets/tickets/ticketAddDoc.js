@@ -36,93 +36,92 @@ const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-servi
 const spinal_env_viewer_plugin_documentation_service_1 = require("spinal-env-viewer-plugin-documentation-service");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-    * @swagger
-    * /api/v1/ticket/{ticketId}/add_doc:
-    *   post:
-    *     security:
-    *       - OauthSecurity:
-    *         - read
-    *     description: Uploads a Doc
-    *     summary: Uploads a Doc
-    *     tags:
-    *       - Workflow & ticket
-    *     parameters:
-    *       - in: path
-    *         name: ticketId
-    *         description: use the dynamic ID
-    *         required: true
-    *         schema:
-    *           type: integer
-    *           format: int64
-    *     requestBody:
-    *       content:
-    *         multipart/form-data:
-    *           schema:
-    *             type: object
-    *             properties:
-    *               file:
-    *                 type: string
-    *                 format: binary
-    *           encoding:
-    *             file:
-    *               style: form
-    *         application/json:
-    *           schema:
-    *             type: object
-    *             required:
-    *               - workflowId
-    *             properties:
-    *               workflowId:
-    *                 type: number
-    *     responses:
-    *       200:
-    *         description: Add Successfully
-    *       400:
-    *         description: Add not Successfully
-    */
-    app.post("/api/v1/ticket/:ticketId/add_doc", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+     * @swagger
+     * /api/v1/ticket/{ticketId}/add_doc:
+     *   post:
+     *     security:
+     *       - OauthSecurity:
+     *         - read
+     *     description: Uploads a Doc
+     *     summary: Uploads a Doc
+     *     tags:
+     *       - Workflow & ticket
+     *     parameters:
+     *       - in: path
+     *         name: ticketId
+     *         description: use the dynamic ID
+     *         required: true
+     *         schema:
+     *           type: integer
+     *           format: int64
+     *     requestBody:
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               file:
+     *                 type: string
+     *                 format: binary
+     *           encoding:
+     *             file:
+     *               style: form
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - workflowId
+     *             properties:
+     *               workflowId:
+     *                 type: number
+     *     responses:
+     *       200:
+     *         description: Add Successfully
+     *       400:
+     *         description: Add not Successfully
+     */
+    app.post('/api/v1/ticket/:ticketId/add_doc', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var workflow = yield spinalAPIMiddleware.load(parseInt(req.body.workflowId, 10));
-            //@ts-ignore
-            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(workflow);
-            var ticket = yield spinalAPIMiddleware.load(parseInt(req.body.ticketId, 10));
+            // var workflow = await spinalAPIMiddleware.load(parseInt(req.body.workflowId, 10));
+            // //@ts-ignore
+            // SpinalGraphService._addNode(workflow)
+            var ticket = yield spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10));
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(ticket);
             // @ts-ignore
             if (!req.files) {
                 res.send({
                     status: false,
-                    message: 'No file uploaded'
+                    message: 'No file uploaded',
                 });
             }
             else {
                 //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-                // @ts-ignore
-                let avatar = req.files.avatar;
+                //@ts-ignore
+                let avatar = req.files.file;
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
-                avatar.mv('./uploads/' + avatar.name);
-                var user = { username: "string", userId: 0 };
+                // avatar.mv('./uploads/' + avatar.name);
+                var user = { username: 'api', userId: 0 };
                 var data = {
                     name: avatar.name,
-                    mimetype: avatar.mimetype,
-                    size: avatar.size
+                    buffer: avatar.data,
                 };
-                yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addFileAsNote(ticket.getId().get(), data, user);
-                //send response
+                yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addFileAsNote(ticket, data, user);
+                // send response
                 res.send({
                     status: true,
                     message: 'File is uploaded',
                     data: {
                         name: avatar.name,
                         mimetype: avatar.mimetype,
-                        size: avatar.size
-                    }
+                        size: avatar.size,
+                    },
                 });
             }
         }
         catch (error) {
             console.log(error);
-            res.status(400).send("ko");
+            res.status(400).send('ko');
         }
         // res.json();
     }));

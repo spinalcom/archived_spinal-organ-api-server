@@ -21,114 +21,135 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
-import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import {
+  SpinalContext,
+  SpinalNode,
+  SpinalGraphService,
+} from 'spinal-env-viewer-graph-service';
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
-import { Room } from '../interfacesGeoContext'
-import { serviceTicketPersonalized } from 'spinal-service-ticket'
-import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
-import getFiles from "../../../utilities/getFiles";
-import { LOGS_EVENTS } from "spinal-service-ticket/dist/Constants";
+import { Room } from '../interfacesGeoContext';
+import { serviceTicketPersonalized } from 'spinal-service-ticket';
+import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
+import getFiles from '../../../utilities/getFiles';
+import { LOGS_EVENTS } from 'spinal-service-ticket/dist/Constants';
 
-module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
+module.exports = function (
+  logger,
+  app: express.Express,
+  spinalAPIMiddleware: spinalAPIMiddleware
+) {
   /**
- * @swagger
- * /api/v1/room/{id}/ticket_list:
- *   get:
- *     security: 
- *       - OauthSecurity: 
- *         - readOnly
- *     description: Returns list of tickets of room
- *     summary: Get list of tickets of room
- *     tags:
- *       - Geographic Context
- *     parameters:
- *      - in: path
- *        name: id
- *        description: use the dynamic ID
- *        required: true
- *        schema:
- *          type: integer
- *          format: int64
- *     responses:
- *       200:
- *         description: Success
- *         content:
- *           application/json:
- *             schema: 
- *               type: array
- *               items: 
- *                $ref: '#/components/schemas/Ticket'
- *       400:
- *         description: Bad request
-*/
-  app.get("/api/v1/room/:id/ticket_list", async (req, res, next) => {
-    let nodes = []
+   * @swagger
+   * /api/v1/room/{id}/ticket_list:
+   *   get:
+   *     security:
+   *       - OauthSecurity:
+   *         - readOnly
+   *     description: Returns list of tickets of room
+   *     summary: Get list of tickets of room
+   *     tags:
+   *       - Geographic Context
+   *     parameters:
+   *      - in: path
+   *        name: id
+   *        description: use the dynamic ID
+   *        required: true
+   *        schema:
+   *          type: integer
+   *          format: int64
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                $ref: '#/components/schemas/Ticket'
+   *       400:
+   *         description: Bad request
+   */
+  app.get('/api/v1/room/:id/ticket_list', async (req, res, next) => {
+    let nodes = [];
     try {
       var room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
       //@ts-ignore
-      SpinalGraphService._addNode(room)
+      SpinalGraphService._addNode(room);
 
-      if (room.getType().get() === "geographicRoom") {
-        var ticketList = await serviceTicketPersonalized.getTicketsFromNode(room.getId().get());
+      if (room.getType().get() === 'geographicRoom') {
+        var ticketList = await serviceTicketPersonalized.getTicketsFromNode(
+          room.getId().get()
+        );
 
         for (let index = 0; index < ticketList.length; index++) {
-          var realNodeTicket = SpinalGraphService.getRealNode(ticketList[index].id)
+          var realNodeTicket = SpinalGraphService.getRealNode(
+            ticketList[index].id
+          );
+          //context && workflow
+          const workflow = SpinalGraphService.getRealNode(
+            realNodeTicket.getContextIds()[0]
+          );
+
           //Step
-          var _step = await realNodeTicket.getParents("SpinalSystemServiceTicketHasTicket").then((steps) => {
-            for (const step of steps) {
-              if (step.getType().get() === "SpinalSystemServiceTicketTypeStep") {
-                return step
+          var _step = await realNodeTicket
+            .getParents('SpinalSystemServiceTicketHasTicket')
+            .then((steps) => {
+              for (const step of steps) {
+                if (
+                  step.getType().get() === 'SpinalSystemServiceTicketTypeStep'
+                ) {
+                  return step;
+                }
               }
-            }
-          })
-          // Notes
-          var notes = await serviceDocumentation.getNotes(realNodeTicket)
-          var _notes = []
-          for (const note of notes) {
-            let infoNote = {
-              userName: note.element.username.get(),
-              date: note.element.date.get(),
-              type: note.element.type.get(),
-              message: note.element.message.get()
-            }
-            _notes.push(infoNote)
-          }
+            });
+
+          var _process = await _step
+            .getParents('SpinalSystemServiceTicketHasStep')
+            .then((processes) => {
+              for (const process of processes) {
+                if (process.getType().get() === 'SpinalServiceTicketProcess') {
+                  return process;
+                }
+              }
+            });
 
           // Notes
-          var notes = await serviceDocumentation.getNotes(realNodeTicket)
-          var _notes = []
+          var notes = await serviceDocumentation.getNotes(realNodeTicket);
+          var _notes = [];
           for (const note of notes) {
             let infoNote = {
               userName: note.element.username.get(),
               date: note.element.date.get(),
               type: note.element.type.get(),
-              message: note.element.message.get()
-            }
-            _notes.push(infoNote)
+              message: note.element.message.get(),
+            };
+            _notes.push(infoNote);
           }
 
           // Files
-          var files = await getFiles(realNodeTicket)
-          var _files = []
-          for (const file of files) {
-            let infoFiles = {
-              Name: file.fileName,
-              fileId: file.targetServerId
+          var _files = [];
+          var fileNode = (await realNodeTicket.getChildren('hasFiles'))[0];
+          if (fileNode) {
+            var filesfromElement = await fileNode.element.load();
+            for (let index = 0; index < filesfromElement.length; index++) {
+              let infoFiles = {
+                dynamicId: filesfromElement[index]._server_id,
+                Name: filesfromElement[index].name.get(),
+              };
+              _files.push(infoFiles);
             }
-            _files.push(infoFiles)
           }
-
 
           // Logs
           async function formatEvent(log) {
-            var texte = "";
+            var texte = '';
             if (log.event == LOGS_EVENTS.creation) {
-              texte = "created";
+              texte = 'created';
             } else if (log.event == LOGS_EVENTS.archived) {
-              texte = "archived";
+              texte = 'archived';
             } else if (log.event == LOGS_EVENTS.unarchive) {
-              texte = "unarchived";
+              texte = 'unarchived';
             } else {
               const promises = log.steps.map((el) =>
                 SpinalGraphService.getNodeAsync(el)
@@ -147,20 +168,20 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
             return texte;
           }
 
-          var logs = await serviceTicketPersonalized.getLogs(realNodeTicket.getId().get())
+          var logs = await serviceTicketPersonalized.getLogs(
+            realNodeTicket.getId().get()
+          );
 
-          var _logs = []
+          var _logs = [];
           for (const log of logs) {
             let infoLogs = {
               userName: log.user.name,
               date: log.creationDate,
               event: await formatEvent(log),
-              ticketStaticId: log.ticketId
-            }
-            _logs.push(infoLogs)
+              ticketStaticId: log.ticketId,
+            };
+            _logs.push(infoLogs);
           }
-
-
 
           var info = {
             dynamicId: realNodeTicket._server_id,
@@ -169,6 +190,32 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
             type: realNodeTicket.getType().get(),
             priority: realNodeTicket.info.priority.get(),
             creationDate: realNodeTicket.info.creationDate.get(),
+            description:
+              realNodeTicket.info.description == undefined
+                ? ''
+                : realNodeTicket.info.description.get(),
+            declarer_id:
+              realNodeTicket.info.declarer_id == undefined
+                ? ''
+                : realNodeTicket.info.declarer_id.get(),
+            userName:
+              realNodeTicket.info.user == undefined
+                ? ''
+                : realNodeTicket.info.user.name.get(),
+            gmaoId:
+              realNodeTicket.info.gmaoId == undefined
+                ? ''
+                : realNodeTicket.info.gmaoId.get(),
+            gmaoDateCreation:
+              realNodeTicket.info.gmaoDateCreation == undefined
+                ? ''
+                : realNodeTicket.info.gmaoDateCreation.get(),
+            process: {
+              dynamicId: _process._server_id,
+              staticId: _process.getId().get(),
+              name: _process.getName().get(),
+              type: _process.getType().get(),
+            },
             step: {
               dynamicId: _step._server_id,
               staticId: _step.getId().get(),
@@ -177,22 +224,21 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
               color: _step.info.color.get(),
               order: _step.info.order.get(),
             },
+            workflowId: workflow._server_id,
+            workflowName: workflow.getName().get(),
             annotation_list: _notes,
             file_list: _files,
-            log_list: _logs
-          }
+            log_list: _logs,
+          };
           nodes.push(info);
         }
       } else {
-        res.status(400).send("node is not of type geographic room");
+        res.status(400).send('node is not of type geographic room');
       }
-
-
     } catch (error) {
       console.log(error);
-      res.status(400).send("ko");
+      res.status(400).send('ko');
     }
     res.json(nodes);
-  })
-}
-
+  });
+};

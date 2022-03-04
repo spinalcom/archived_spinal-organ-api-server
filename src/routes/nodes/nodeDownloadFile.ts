@@ -22,52 +22,82 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import {
+  SpinalContext,
+  SpinalNode,
+  SpinalGraphService,
+} from 'spinal-env-viewer-graph-service';
 import { FileSystem } from 'spinal-core-connectorjs_type';
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
-import { serviceTicketPersonalized } from 'spinal-service-ticket'
-import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
-import { ServiceUser } from "spinal-service-user";
+import { serviceTicketPersonalized } from 'spinal-service-ticket';
+import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
+import { ServiceUser } from 'spinal-service-user';
+var http = require('http');
+var fs = require('fs');
+import config from '../../../config';
 
-module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
-
+module.exports = function (
+  logger,
+  app: express.Express,
+  spinalAPIMiddleware: spinalAPIMiddleware
+) {
   /**
- * @swagger
- * /api/v1/node/{id}/download_file:
- *   post:
- *     security: 
- *       - OauthSecurity: 
- *         - read
- *     description: Download a Doc
- *     summary: Download a Doc
- *     tags:
- *       - Nodes
- *     parameters:
- *       - in: path
- *         name: id
- *         description: use the dynamic ID
- *         required: true
- *         schema:
- *           type: integer
- *           format: int64
- *     responses:
- *       200:
- *         description: Download Successfully
- *       400:
- *         description: Download not Successfully
+   * @swagger
+   * /api/v1/node/{id}/download_file:
+   *   post:
+   *     security:
+   *       - OauthSecurity:
+   *         - read
+   *     description: Download a Doc
+   *     summary: Download a Doc
+   *     tags:
+   *       - Nodes
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         description: use the dynamic ID
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           format: int64
+   *     responses:
+   *       200:
+   *         description: Download Successfully
+   *       400:
+   *         description: Download not Successfully
    */
-  app.post("/api/v1/node/:id/download_file", async (req, res, next) => {
+
+  app.use('/api/v1/node/:id/download_file', async (req, res, next) => {
     try {
       var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
-      //@ts-ignore
-      SpinalGraphService._addNode(node)
-
+      var p = await down(node);
+      res.download(p, (error) => { });
     } catch (error) {
       console.log(error);
-      res.status(400).send("ko");
+      res.status(400).send('ko');
     }
-    // res.json();
-  })
+  });
+};
 
+function down(node): Promise<string> {
+  return new Promise((resolve, reject) => {
+    node.load((argPath) => {
+      const p = `${__dirname}/${node.name.get()}`;
+      const f = fs.createWriteStream(p);
+
+      http.get(
+        `http://${config.spinalConnector.host}:${config.spinalConnector.port}/sceen/_?u=${argPath._server_id}`,
+        function (response) {
+          response.pipe(f);
+          response.on('end', async () => {
+            resolve(p);
+          });
+          response.on('error', function (err) {
+            console.log(err);
+          });
+        }
+      );
+    });
+  });
 }

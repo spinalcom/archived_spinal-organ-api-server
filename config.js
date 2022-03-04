@@ -39,4 +39,5 @@ module.exports = {
     // path to a digital twin in spinalhub filesystem
     path: process.env.SPINAL_DTWIN_PATH || "EDIT_ME",
   },
+  runLocalServer: process.env.RUN_LOCAL_SERVER || false, // Change it to true, if you want run the local server
 };

@@ -40,75 +40,83 @@ const awaitSync_1 = require("../../../utilities/awaitSync");
 const loadNode_1 = require("../../../utilities/loadNode");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
-    * @swagger
-    * /api/v1/ticket/create_ticket:
-    *   post:
-    *     security:
-    *       - OauthSecurity:
-    *         - read
-    *     description: add a Ticket
-    *     summary: add a Ticket
-    *     tags:
-    *       - Workflow & ticket
-    *     requestBody:
-    *       description: For the two parameters *workflow* and *process* you can browse it either by putting the dynamicId or the name
-    *       required: true
-    *       content:
-    *         application/json:
-    *           schema:
-    *             type: object
-    *             required:
-    *               - workflow
-    *               - process
-    *               - nodeDynamicId
-    *               - name
-    *               - priority
-    *               - description
-    *               - imageString
-    *             properties:
-    *               workflow:
-    *                 type: string
-    *               process:
-    *                 type: string
-    *               nodeDynamicId:
-    *                 type: number
-    *               name:
-    *                 type: string
-    *               priority:
-    *                 type: number
-    *               description:
-    *                 type: string
-    *               images:
-    *                 type: array
-    *                 items:
-    *                  type: object
-    *                  properties:
-    *                    name:
-    *                      type: string
-    *                    value:
-    *                      type: string
-    *                    comments:
-    *                      type: string
-    *     responses:
-    *       200:
-    *         description: Success
-    *         content:
-    *           application/json:
-    *             schema:
-    *                $ref: '#/components/schemas/Ticket'
-    *       400:
-    *         description: Add not Successfully
-    */
-    app.post("/api/v1/ticket/create_ticket", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-        var _a;
+     * @swagger
+     * /api/v1/ticket/create_ticket:
+     *   post:
+     *     security:
+     *       - OauthSecurity:
+     *         - read
+     *     description: add a Ticket
+     *     summary: add a Ticket
+     *     tags:
+     *       - Workflow & ticket
+     *     requestBody:
+     *       description: For the two parameters *workflow* and *process* you can browse it either by putting the dynamicId or the name
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - workflow
+     *               - process
+     *               - nodeDynamicId
+     *               - name
+     *               - priority
+     *               - description
+     *               - declarer_id
+     *               - imageString
+     *             properties:
+     *               workflow:
+     *                 type: string
+     *               process:
+     *                 type: string
+     *               nodeDynamicId:
+     *                 type: number
+     *               name:
+     *                 type: string
+     *               priority:
+     *                 type: number
+     *               description:
+     *                 type: string
+     *               declarer_id:
+     *                 type: string
+     *               images:
+     *                 type: array
+     *                 items:
+     *                  type: object
+     *                  properties:
+     *                    name:
+     *                      type: string
+     *                    value:
+     *                      type: string
+     *                    comments:
+     *                      type: string
+     *     responses:
+     *       200:
+     *         description: Success
+     *         content:
+     *           application/json:
+     *             schema:
+     *                $ref: '#/components/schemas/Ticket'
+     *       400:
+     *         description: Add not Successfully
+     */
+    app.post('/api/v1/ticket/create_ticket', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
         try {
             let ticketCreated;
             let ticketInfo = {
                 name: req.body.name,
                 priority: req.body.priority,
-                description: req.body.description
+                description: req.body.description,
+                declarer_id: req.body.declarer_id,
             };
-            let arrayofServerId = [parseInt(req.body.nodeDynamicId, 10), parseInt(req.body.workflow, 10), parseInt(req.body.process, 10)];
+            let arrayofServerId = [
+                parseInt(req.body.nodeDynamicId, 10),
+                parseInt(req.body.workflow, 10),
+                parseInt(req.body.process, 10),
+            ];
             const [node, workflowById, processById] = yield (0, loadNode_1._load)(arrayofServerId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
@@ -137,7 +145,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     ticketCreated = yield spinal_service_ticket_1.serviceTicketPersonalized.addTicket(ticketInfo, processByName.getId().get(), workflowByName.getId().get(), node.getId().get());
                 }
                 else {
-                    res.status(400).send("the workflow does not contain this process");
+                    res.status(400).send('the workflow does not contain this process');
                 }
             }
             else {
@@ -150,7 +158,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         ticketCreated = yield spinal_service_ticket_1.serviceTicketPersonalized.addTicket(ticketInfo, processById.getId().get(), workflowById.getId().get(), node.getId().get());
                     }
                     else {
-                        res.status(400).send("the workflow does not contain this process");
+                        res.status(400).send('the workflow does not contain this process');
                     }
                 }
             }
@@ -166,16 +174,17 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         type: realNodeTicket.getType().get(),
                         priority: realNodeTicket.info.priority.get(),
                         description: (_a = realNodeTicket.info) === null || _a === void 0 ? void 0 : _a.description.get(),
+                        declarer_id: (_b = realNodeTicket.info) === null || _b === void 0 ? void 0 : _b.declarer_id.get(),
                         creationDate: realNodeTicket.info.creationDate.get(),
                     };
                 }
             }
             if (req.body.images && req.body.images.length > 0) {
                 const objImage = new spinal_core_connectorjs_type_1.Lst(req.body.images);
-                realNodeTicket.info.add_attr("images", new spinal_core_connectorjs_type_1.Ptr(objImage));
+                realNodeTicket.info.add_attr('images', new spinal_core_connectorjs_type_1.Ptr(objImage));
                 for (const image of req.body.images) {
                     // @ts-ignore
-                    var user = { username: "admin", userId: 0 };
+                    var user = { username: 'admin', userId: 0 };
                     yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addNote(realNodeTicket, user, image.value);
                 }
             }
