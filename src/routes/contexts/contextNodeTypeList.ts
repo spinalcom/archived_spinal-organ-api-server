@@ -64,6 +64,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       var type_list = await SpinalGraphService.browseAndClassifyByTypeInContext(SpinalContextId, SpinalContextId);
     } catch (error) {
       console.log(error);
+      if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send("context not found");
     }
     res.json(type_list.types);

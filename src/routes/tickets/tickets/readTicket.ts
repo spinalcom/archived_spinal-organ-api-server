@@ -202,11 +202,11 @@ module.exports = function (
           elementSelected == undefined
             ? 0
             : {
-                dynamicId: elementSelected._server_id,
-                staticId: elementSelected.getId().get(),
-                name: elementSelected.getName().get(),
-                type: elementSelected.getType().get(),
-              },
+              dynamicId: elementSelected._server_id,
+              staticId: elementSelected.getId().get(),
+              name: elementSelected.getName().get(),
+              type: elementSelected.getType().get(),
+            },
         userName:
           _ticket.info.user == undefined ? '' : _ticket.info.user.name.get(),
         gmaoId:
@@ -237,6 +237,7 @@ module.exports = function (
       };
     } catch (error) {
       console.log(error);
+      if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send('ko');
     }
     res.json(info);

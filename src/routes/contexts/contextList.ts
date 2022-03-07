@@ -70,6 +70,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       }
     } catch (error) {
       console.error(error);
+      if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send("list of contexts is not loaded");
     }
     res.send(nodes);

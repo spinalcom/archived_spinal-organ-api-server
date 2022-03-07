@@ -22,6 +22,15 @@
  * with this file. If not, see
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
@@ -82,23 +91,32 @@ class SpinalAPIMiddleware {
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
     }
     load(server_id) {
-        if (!server_id) {
-            return Promise.reject("Invalid serverId");
-        }
-        if (typeof spinal_core_connectorjs_type_1.FileSystem._objects[server_id] !== "undefined") {
-            // @ts-ignore
-            return Promise.resolve(spinal_core_connectorjs_type_1.FileSystem._objects[server_id]);
-        }
-        return new Promise((resolve, reject) => {
-            this.conn.load_ptr(server_id, (model) => {
-                if (!model) {
-                    // on error
-                    reject("loadptr failed...!");
-                }
-                else {
-                    // on success
-                    resolve(model);
-                }
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!server_id) {
+                return Promise.reject({ code: 406, message: "Invalid serverId" });
+            }
+            let node = spinal_core_connectorjs_type_1.FileSystem._objects[server_id];
+            if (typeof node !== "undefined") {
+                const context = yield this._nodeIsBelongUserContext(node);
+                // @ts-ignore
+                if (context)
+                    return Promise.resolve(node);
+                return Promise.reject({ code: 401, message: "Unauthorized" });
+            }
+            return new Promise((resolve, reject) => {
+                this.conn.load_ptr(server_id, (model) => __awaiter(this, void 0, void 0, function* () {
+                    if (!model) {
+                        // on error
+                        reject({ code: 404, message: "Node is not found" });
+                    }
+                    else {
+                        const context = yield this._nodeIsBelongUserContext(model);
+                        // @ts-ignore
+                        if (context)
+                            return resolve(node);
+                        return reject({ code: 401, message: "Unauthorized" });
+                    }
+                }));
             });
         });
     }
@@ -126,6 +144,16 @@ class SpinalAPIMiddleware {
         });
         this.loadedPtr.set(server_id, prom);
         return prom;
+    }
+    _nodeIsBelongUserContext(node) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contexts = yield this._getUserContexts();
+            return contexts.find(context => node.belongsToContext(context));
+        });
+    }
+    _getUserContexts() {
+        const graph = this.getGraph();
+        return graph.getChildren();
     }
 }
 SpinalAPIMiddleware.instance = null;

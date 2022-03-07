@@ -62,6 +62,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
       groupManagerService.createGroupContext(req.body.contextName, "BmsEndpoint")
     } catch (error) {
       console.error(error)
+      if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send("ko")
     }
     res.json();

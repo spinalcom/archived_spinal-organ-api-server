@@ -25,7 +25,7 @@
 const { runLocalServer } = require("./config");
 const { runServerRest, spinalAPIMiddleware } = require("./build");
 
-if (runLocalServer == "true") {
+if (runLocalServer == "true" || runLocalServer === true) {
   runServerRest();
 }
 

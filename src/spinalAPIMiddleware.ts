@@ -36,6 +36,11 @@ class SpinalAPIMiddleware {
   loadedPtr: Map<number, any>;
   conn: spinal.FileSystem;
 
+
+  constructor() {
+    this.loadedPtr = new Map();
+  }
+
   // singleton class 
   static getInstance() {
     if (SpinalAPIMiddleware.instance === null) {
@@ -44,10 +49,6 @@ class SpinalAPIMiddleware {
     return SpinalAPIMiddleware.instance;
   }
 
-
-  constructor() {
-    this.loadedPtr = new Map();
-  }
 
   setConnection(connect: spinal.FileSystem) {
     this.conn = connect;
@@ -75,7 +76,6 @@ class SpinalAPIMiddleware {
     spinalCore.load(this.conn, config.file.path, this.onLoadSuccess, this.onLoadError);
   }
 
-
   onLoadError(): void {
     console.error(`File does not exist in location ${config.file.path}`);
   }
@@ -97,25 +97,32 @@ class SpinalAPIMiddleware {
   }
 
 
-  load<T extends spinal.Model>(server_id: number): Promise<T> {
+  async load<T extends spinal.Model>(server_id: number): Promise<T> {
     if (!server_id) {
-      return Promise.reject("Invalid serverId");
+      return Promise.reject({ code: 406, message: "Invalid serverId" });
     }
-    if (typeof FileSystem._objects[server_id] !== "undefined") {
+
+    let node = FileSystem._objects[server_id];
+    if (typeof node !== "undefined") {
+      const context = await this._nodeIsBelongUserContext(<SpinalNode<any>>node);
       // @ts-ignore
-      return Promise.resolve(FileSystem._objects[server_id]);
+      if (context) return Promise.resolve(node);
+      return Promise.reject({ code: 401, message: "Unauthorized" });
     }
+
+
     return new Promise((resolve, reject) => {
-      this.conn.load_ptr(server_id,
-        (model: T) => {
-          if (!model) {
-            // on error
-            reject("loadptr failed...!");
-          } else {
-            // on success
-            resolve(model);
-          }
-        });
+      this.conn.load_ptr(server_id, async (model: T) => {
+        if (!model) {
+          // on error
+          reject({ code: 404, message: "Node is not found" });
+        } else {
+          const context = await this._nodeIsBelongUserContext(<any>model);
+          // @ts-ignore
+          if (context) return resolve(node);
+          return reject({ code: 401, message: "Unauthorized" });
+        }
+      });
     });
   }
 
@@ -126,6 +133,7 @@ class SpinalAPIMiddleware {
     if (this.loadedPtr.has(server_id)) {
       return this.loadedPtr.get(server_id);
     }
+
     const prom: Promise<T> = new Promise((resolve, reject) => {
       try {
         this.conn.load_ptr(
@@ -143,6 +151,16 @@ class SpinalAPIMiddleware {
     return prom;
   }
 
+
+  private async _nodeIsBelongUserContext(node: SpinalNode<any>): Promise<SpinalContext<any>> {
+    const contexts = await this._getUserContexts();
+    return contexts.find(context => node.belongsToContext(context))
+  }
+
+  private _getUserContexts(): Promise<SpinalNode<any>[]> {
+    const graph = this.getGraph();
+    return graph.getChildren();
+  }
 
 }
 
