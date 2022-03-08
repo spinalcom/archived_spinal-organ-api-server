@@ -29,7 +29,6 @@ const disconnectionHandler_1 = require("./disconnectionHandler");
 function connectionHandler(io) {
     io.on("connection", (socket) => {
         const { handshake: { address, auth } } = socket;
-        console.log(`${socket.id} is connected`);
         (0, subscribeHandler_1.subscribeHandler)(io, socket);
         (0, disconnectionHandler_1.disconnecthandler)(socket);
     });

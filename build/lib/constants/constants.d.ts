@@ -11,3 +11,4 @@ export declare enum EVENT_NAMES {
     childrenRemoved = "childrenRemoved",
     addChildInContext = "addChildInContext"
 }
+export declare const EXCLUDES_TYPES: any[];

@@ -26,10 +26,11 @@
 import { spinalCore, FileSystem } from 'spinal-core-connectorjs_type';
 import { SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { SpinalContext, SpinalGraph, SpinalNode } from 'spinal-model-graph';
-import { spinalGraphUtils } from "./socket/spinal/graphUtils";
+import { spinalGraphUtils } from "./graphUtils";
 // get the config
 const { SpinalServiceUser } = require('spinal-service-user');
 import * as config from '../config';
+import { EXCLUDES_TYPES } from './lib';
 
 class SpinalAPIMiddleware {
   static instance: SpinalAPIMiddleware = null;
@@ -104,9 +105,9 @@ class SpinalAPIMiddleware {
 
     let node = FileSystem._objects[server_id];
     if (typeof node !== "undefined") {
-      const context = await this._nodeIsBelongUserContext(<SpinalNode<any>>node);
+      const found = await this._nodeIsBelongUserContext(<SpinalNode<any>>node);
       // @ts-ignore
-      if (context) return Promise.resolve(node);
+      if (found) return Promise.resolve(node);
       return Promise.reject({ code: 401, message: "Unauthorized" });
     }
 
@@ -117,9 +118,9 @@ class SpinalAPIMiddleware {
           // on error
           reject({ code: 404, message: "Node is not found" });
         } else {
-          const context = await this._nodeIsBelongUserContext(<any>model);
+          const contextFound = await this._nodeIsBelongUserContext(<any>model);
           // @ts-ignore
-          if (context) return resolve(node);
+          if (contextFound) return resolve(node);
           return reject({ code: 401, message: "Unauthorized" });
         }
       });
@@ -152,9 +153,13 @@ class SpinalAPIMiddleware {
   }
 
 
-  private async _nodeIsBelongUserContext(node: SpinalNode<any>): Promise<SpinalContext<any>> {
+  private async _nodeIsBelongUserContext(node: SpinalNode<any>): Promise<boolean> {
+    const type = node.getType().get();
+    if (EXCLUDES_TYPES.indexOf(type) !== -1) return true;
+
     const contexts = await this._getUserContexts();
-    return contexts.find(context => node.belongsToContext(context))
+    const found = contexts.find(context => node.belongsToContext(context))
+    return found ? true : false;
   }
 
   private _getUserContexts(): Promise<SpinalNode<any>[]> {

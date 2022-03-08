@@ -23,7 +23,11 @@
  */
 
 const { runLocalServer } = require("./config");
-const { runServerRest, spinalAPIMiddleware } = require("./build");
+const {
+  runServerRest,
+  spinalAPIMiddleware,
+  wrapMiddleware,
+} = require("./build");
 
 if (runLocalServer == "true" || runLocalServer === true) {
   runServerRest();
@@ -32,4 +36,5 @@ if (runLocalServer == "true" || runLocalServer === true) {
 module.exports = {
   runServerRest,
   spinalAPIMiddleware,
+  wrapMiddleware,
 };

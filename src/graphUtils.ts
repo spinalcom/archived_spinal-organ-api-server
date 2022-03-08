@@ -28,7 +28,7 @@ import { FileSystem, Model } from 'spinal-core-connectorjs_type';
 import { SpinalTimeSeries } from "spinal-model-timeseries";
 import * as lodash from "lodash";
 import { Server } from "socket.io";
-import { OK_STATUS, EVENT_NAMES, IAction, IScope, ISubscribeOptions } from '../../lib'
+import { OK_STATUS, EVENT_NAMES, IAction, IScope, ISubscribeOptions } from './lib'
 
 
 

@@ -32,12 +32,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.spinalAPIMiddleware = exports.runServerRest = void 0;
+exports.wrapMiddleware = exports.spinalAPIMiddleware = exports.runServerRest = void 0;
 const routes_1 = require("./routes/routes");
 const socket_1 = require("./socket");
 const api_server_1 = require("./api-server");
 const initSwagger_1 = require("./initSwagger");
 const spinalAPIMiddleware_1 = require("./spinalAPIMiddleware");
+const middlewares_1 = require("./socket/middlewares");
+Object.defineProperty(exports, "wrapMiddleware", { enumerable: true, get: function () { return middlewares_1.wrapMiddleware; } });
 const path = require("path");
 const config = require("../config");
 const spinalAPIMiddleware = spinalAPIMiddleware_1.default.getInstance();
@@ -51,14 +53,14 @@ function runServerRest(server, app) {
             yield spinalAPIMiddleware.initGraph();
         let api = app || (0, api_server_1.default)();
         server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
-        (0, initSwagger_1.initSwaggerDoc)(api);
-        (0, socket_1.runSocketServer)(server);
-        (0, routes_1.default)(logger, api, spinalAPIMiddleware);
         api.get('/logo.png', (req, res) => {
             const assets = path.resolve(__dirname, '../assets');
             res.sendFile(`${assets}/spinalcore.png`);
             // res.sendFile('spinalcore.png', { root: __dirname });
         });
+        (0, initSwagger_1.initSwaggerDoc)(api);
+        (0, routes_1.default)(logger, api, spinalAPIMiddleware);
+        (0, socket_1.runSocketServer)(server);
     });
 }
 exports.runServerRest = runServerRest;

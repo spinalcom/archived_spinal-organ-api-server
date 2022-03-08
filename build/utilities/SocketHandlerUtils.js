@@ -36,7 +36,7 @@ exports._getRoomNameFunc = exports.getNodesFunc = exports.structureDataFunc = vo
 const lib_1 = require("../lib");
 const lodash = require("lodash");
 const spinal_model_graph_1 = require("spinal-model-graph");
-const graphUtils_1 = require("../socket/spinal/graphUtils");
+const graphUtils_1 = require("../graphUtils");
 function structureDataFunc(args) {
     let ids = lodash.flattenDeep(args.slice(0, args.length - 1));
     // let callback;

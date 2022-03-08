@@ -25,7 +25,7 @@
 import { ISubscribeOptions, INodeId, OK_STATUS, NOK_STATUS, IGetNodeRes, IScope, INodeData } from "../lib";
 import * as lodash from "lodash";
 import { SpinalContext, SpinalNode } from "spinal-model-graph";
-import { spinalGraphUtils } from "../socket/spinal/graphUtils";
+import { spinalGraphUtils } from "../graphUtils";
 
 
 export function structureDataFunc(args: any[]): { ids: INodeId[], options: ISubscribeOptions } {

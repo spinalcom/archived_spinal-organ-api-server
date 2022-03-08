@@ -34,10 +34,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
-const graphUtils_1 = require("./socket/spinal/graphUtils");
+const graphUtils_1 = require("./graphUtils");
 // get the config
 const { SpinalServiceUser } = require('spinal-service-user');
 const config = require("../config");
+const lib_1 = require("./lib");
 class SpinalAPIMiddleware {
     constructor() {
         this.loadedPtr = new Map();
@@ -97,9 +98,9 @@ class SpinalAPIMiddleware {
             }
             let node = spinal_core_connectorjs_type_1.FileSystem._objects[server_id];
             if (typeof node !== "undefined") {
-                const context = yield this._nodeIsBelongUserContext(node);
+                const found = yield this._nodeIsBelongUserContext(node);
                 // @ts-ignore
-                if (context)
+                if (found)
                     return Promise.resolve(node);
                 return Promise.reject({ code: 401, message: "Unauthorized" });
             }
@@ -110,9 +111,9 @@ class SpinalAPIMiddleware {
                         reject({ code: 404, message: "Node is not found" });
                     }
                     else {
-                        const context = yield this._nodeIsBelongUserContext(model);
+                        const contextFound = yield this._nodeIsBelongUserContext(model);
                         // @ts-ignore
-                        if (context)
+                        if (contextFound)
                             return resolve(node);
                         return reject({ code: 401, message: "Unauthorized" });
                     }
@@ -147,8 +148,12 @@ class SpinalAPIMiddleware {
     }
     _nodeIsBelongUserContext(node) {
         return __awaiter(this, void 0, void 0, function* () {
+            const type = node.getType().get();
+            if (lib_1.EXCLUDES_TYPES.indexOf(type) !== -1)
+                return true;
             const contexts = yield this._getUserContexts();
-            return contexts.find(context => node.belongsToContext(context));
+            const found = contexts.find(context => node.belongsToContext(context));
+            return found ? true : false;
         });
     }
     _getUserContexts() {

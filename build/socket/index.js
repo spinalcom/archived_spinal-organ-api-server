@@ -26,17 +26,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.runSocketServer = void 0;
 const socket_io_1 = require("socket.io");
 const connectionHandler_1 = require("./handlers/connectionHandler");
-const graphUtils_1 = require("./spinal/graphUtils");
+const graphUtils_1 = require("../graphUtils");
+const middlewares_1 = require("./middlewares");
 const serverOption = { pingTimeout: 30000, maxHttpBufferSize: 1e8, transports: ["websocket"] };
 function runSocketServer(app) {
-    // const httpServer = createServer(app);
-    // const io = new Server(httpServer, serverOption);
     const io = new socket_io_1.Server(app, serverOption);
-    (0, connectionHandler_1.connectionHandler)(io);
+    (0, middlewares_1.setMiddleware)(io);
     graphUtils_1.spinalGraphUtils.setIo(io);
-    // httpServer.listen(socketPort, () => {
-    //     console.log(`socket server listen on port : ${socketPort}`);
-    // });
+    (0, connectionHandler_1.connectionHandler)(io);
+    console.log("socket is running...");
 }
 exports.runSocketServer = runSocketServer;
 //# sourceMappingURL=index.js.map

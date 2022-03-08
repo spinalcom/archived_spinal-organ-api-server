@@ -24,21 +24,18 @@
 
 import { Server } from 'socket.io';
 import { connectionHandler } from "./handlers/connectionHandler";
-import { spinalGraphUtils } from "./spinal/graphUtils";
+import { spinalGraphUtils } from "../graphUtils";
+import { setMiddleware } from './middlewares'
 
 const serverOption: any = { pingTimeout: 30000, maxHttpBufferSize: 1e8, transports: ["websocket"] };
 
 
 export function runSocketServer(app: any) {
 
-    // const httpServer = createServer(app);
-    // const io = new Server(httpServer, serverOption);
     const io = new Server(app, serverOption);
-    connectionHandler(io);
+    setMiddleware(io);
     spinalGraphUtils.setIo(io);
+    connectionHandler(io);
+    console.log("socket is running...");
 
-    // httpServer.listen(socketPort, () => {
-    //     console.log(`socket server listen on port : ${socketPort}`);
-    // });
 }
-

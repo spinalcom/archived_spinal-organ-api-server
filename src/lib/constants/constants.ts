@@ -22,6 +22,8 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
+import { URL_TYPE, NOTE_TYPE, CATEGORY_TYPE, ATTRIBUTE_TYPE } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
+
 export const OK_STATUS: string = "success";
 export const NOK_STATUS: string = "error";
 export const SUBSCRIBE_EVENT: string = "subscribe";
@@ -36,3 +38,5 @@ export enum EVENT_NAMES {
     childrenRemoved = "childrenRemoved",
     addChildInContext = "addChildInContext"
 }
+
+export const EXCLUDES_TYPES = [URL_TYPE, NOTE_TYPE, CATEGORY_TYPE, ATTRIBUTE_TYPE]

@@ -24,14 +24,13 @@
 
 import { Server, Socket } from "socket.io";
 import { subscribeHandler } from "./subscribeHandler";
-import { disconnecthandler } from './disconnectionHandler'
+import { disconnecthandler } from './disconnectionHandler';
+
 
 
 export function connectionHandler(io: Server) {
     io.on("connection", (socket: Socket) => {
-
         const { handshake: { address, auth } } = socket;
-        console.log(`${socket.id} is connected`);
         subscribeHandler(io, socket);
         disconnecthandler(socket);
     })

@@ -34,7 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subscribeHandler = void 0;
 const SocketHandlerUtils_1 = require("../../utilities/SocketHandlerUtils");
-const graphUtils_1 = require("../spinal/graphUtils");
+const graphUtils_1 = require("../../graphUtils");
 const lib_1 = require("../../lib");
 function subscribeHandler(io, socket) {
     socket.on(lib_1.SUBSCRIBE_EVENT, (...args) => __awaiter(this, void 0, void 0, function* () {

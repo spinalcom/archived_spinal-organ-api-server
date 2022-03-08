@@ -24,8 +24,9 @@
 
 import { Server, Socket } from "socket.io";
 import { structureDataFunc, getNodesFunc, _getRoomNameFunc } from "../../utilities/SocketHandlerUtils";
-import { spinalGraphUtils } from "../spinal/graphUtils";
+import { spinalGraphUtils } from "../../graphUtils";
 import { OK_STATUS, SUBSCRIBE_EVENT, SUBSCRIBED } from '../../lib';
+
 
 export function subscribeHandler(io: Server, socket: Socket) {
 
