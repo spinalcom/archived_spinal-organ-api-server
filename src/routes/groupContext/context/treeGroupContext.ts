@@ -28,6 +28,7 @@ import { ContextTree } from '../interfacesGroupContexts'
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import { recTree } from '../../../utilities/recTree'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -64,7 +65,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     var contexts: ContextTree;
 
     try {
-      var context = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var context = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       if (context instanceof SpinalContext) {
         contexts = {
           dynamicId: context._server_id,

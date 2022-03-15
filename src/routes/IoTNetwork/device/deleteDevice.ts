@@ -25,6 +25,7 @@
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -54,7 +55,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 */
   app.delete("/api/v1/device/:id/delete", async (req, res, next) => {
     try {
-      let device = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      let device = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(device);
       if (device.getType().get() === "BmsDevice") {

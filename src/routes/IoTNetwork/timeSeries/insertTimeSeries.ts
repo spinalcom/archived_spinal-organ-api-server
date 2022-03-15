@@ -27,6 +27,7 @@ import spinalServiceTimeSeries from '../spinalTimeSeries'
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import * as moment from 'moment'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -74,18 +75,18 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 
   app.post("/api/v1/endpoint/:id/timeSeries/insert", async (req, res, next) => {
 
-     try {
-      
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+    try {
+      const profileId = getProfileId(req);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(node);
       var timeseries = await spinalServiceTimeSeries().getOrCreateTimeSeries(node.getId().get())
       const newValue = req.body.newValue;
       const date = moment(req.body.date, ["DD-MM-YYYY HH:mm:ss", "DD MM YYYY HH:mm:ss", "DD/MM/YYYY HH:mm:ss"], true)
 
-     await timeseries.insert(newValue, date.toDate())
-      
-      
+      await timeseries.insert(newValue, date.toDate())
+
+
     } catch (error) {
       console.error(error)
       res.status(400).send()

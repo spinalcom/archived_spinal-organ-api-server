@@ -25,6 +25,8 @@
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { Workflow } from '../interfacesWorkflowAndTickets'
+import { profile } from 'console';
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -54,7 +56,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     let nodes = [];
     try {
-      var childrens = await spinalAPIMiddleware.getGraph().getChildren("hasContext");
+      const profileId = getProfileId(req);
+      var childrens = await spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
 
       for (const child of childrens) {
         if (child.getType().get() === "SpinalSystemServiceTicket") {

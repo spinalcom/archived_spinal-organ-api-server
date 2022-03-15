@@ -26,6 +26,7 @@ import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceTicketPersonalized } from 'spinal-service-ticket'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -75,8 +76,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.put("/api/v1/workflow/:workflowId/process/:processId/update", async (req, res, next) => {
     try {
-      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10));
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.processId, 10));
+      const profileId = getProfileId(req);
+      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10), profileId);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.processId, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(node);
 

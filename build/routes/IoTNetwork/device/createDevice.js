@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const networkService_1 = require("../networkService");
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -69,7 +70,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.post("/api/v1/device/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var network = yield spinalAPIMiddleware.load(parseInt(req.body.networkDynamicId));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var network = yield spinalAPIMiddleware.load(parseInt(req.body.networkDynamicId), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(network);
             var contextId = yield network.getContextIds();
@@ -86,7 +88,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 networkName: network.getName().get(),
                 networkType: "NetworkVirtual"
             };
-            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(), configService, true);
+            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(profileId), configService, true);
             //@ts-ignore
             (0, networkService_1.default)().createNewBmsDevice(network.getId().get(), obj);
         }

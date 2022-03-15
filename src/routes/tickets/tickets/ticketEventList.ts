@@ -27,6 +27,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalEvent, SpinalEventService } from "spinal-env-viewer-task-service";
 import { sendDate, verifDate } from "../../../utilities/dateFunctions"
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
 * @swagger
@@ -76,9 +77,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 */
   app.post("/api/v1/ticket/:id/event_list", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
       //ticket node 
       var nodes = [];
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(node)
 

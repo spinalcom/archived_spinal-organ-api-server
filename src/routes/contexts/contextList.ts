@@ -25,6 +25,7 @@
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { Context } from './interfacesContexts'
+import { getProfileId } from '../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -54,10 +55,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     let nodes = [];
     try {
-      var graph = spinalAPIMiddleware.getGraph()
+      const profileId = getProfileId(req);
+      var graph = spinalAPIMiddleware.getGraph(profileId)
 
-      var relationNames = spinalAPIMiddleware.getGraph().getRelationNames();
-      var childrens = await spinalAPIMiddleware.getGraph().getChildren(relationNames);
+      var relationNames = graph.getRelationNames();
+      var childrens = await graph.getChildren(relationNames);
 
       for (const child of childrens) {
         let info: Context = {

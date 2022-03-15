@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const corseChildrenAndParentNode_1 = require("../../utilities/corseChildrenAndParentNode");
 const spinal_model_graph_1 = require("spinal-model-graph");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -47,7 +48,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
         try {
             var nodes;
             var node_list = [];
-            var relation = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var relation = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             if (relation instanceof spinal_model_graph_1.SpinalRelationLstPtr || relation instanceof spinal_model_graph_1.SpinalRelationPtrLst || relation instanceof spinal_model_graph_1.SpinalRelationRef) {
                 nodes = yield relation.getChildren();
                 for (let index = 0; index < nodes.length; index++) {

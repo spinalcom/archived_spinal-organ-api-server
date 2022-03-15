@@ -30,6 +30,7 @@ import {
   SpinalRelationPtrLst,
   SpinalRelationRef
 } from 'spinal-model-graph'
+import { getProfileId } from '../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
   /**
@@ -69,8 +70,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     try {
       var nodes;
       var node_list = [];
-      var relation = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
-
+      const profileId = getProfileId(req);
+      var relation = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
 
       if (relation instanceof SpinalRelationLstPtr || relation instanceof SpinalRelationPtrLst || relation instanceof SpinalRelationRef) {
         nodes = await relation.getChildren();

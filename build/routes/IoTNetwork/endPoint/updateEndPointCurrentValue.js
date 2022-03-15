@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -77,7 +78,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.put("/api/v1/endpoint/:id/update", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         let info;
         try {
-            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             SpinalGraphService._addNode(node);
             var element = yield node.element.load();
             element.currentValue.set(req.body.newValue);

@@ -26,6 +26,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -62,8 +63,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/equipementsGroup/:id/read", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
 
-      var groupContext: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var groupContext: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(groupContext)
       if (groupContext.getType().get() === "BIMObjectGroupContext") {

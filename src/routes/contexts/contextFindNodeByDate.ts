@@ -30,6 +30,7 @@ import { findOneInContext } from '../../utilities/findOneInContext';
 import { spinalCore, FileSystem } from 'spinal-core-connectorjs_type';
 import { verifDate } from "../../utilities/dateFunctions";
 import * as moment from 'moment'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -79,8 +80,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.post("/api/v1/find_node_in_context_by_date", async (req, res, next) => {
 
     try {
-
-      var context: SpinalContext<any> = await spinalAPIMiddleware.load(parseInt(req.body.contextId, 10))
+      const profileId = getProfileId(req);
+      var context: SpinalContext<any> = await spinalAPIMiddleware.load(parseInt(req.body.contextId, 10), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(context);
 

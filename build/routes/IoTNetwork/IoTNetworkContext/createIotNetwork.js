@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const networkService_1 = require("../networkService");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -65,13 +66,14 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.post("/api/v1/IoTNetworkContext/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
             let configService = {
                 contextName: req.body.contextName,
                 contextType: "Network",
                 networkName: req.body.networkName,
                 networkType: "NetworkVirtual"
             };
-            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(), configService, true);
+            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(profileId), configService, true);
         }
         catch (error) {
             console.error(error);

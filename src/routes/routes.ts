@@ -23,7 +23,7 @@
  */
 
 import * as express from 'express';
-import { read } from 'fs';
+
 function routes(logger, app: express.Express, spinalAPIMiddleware) {
   //contexts routes
 

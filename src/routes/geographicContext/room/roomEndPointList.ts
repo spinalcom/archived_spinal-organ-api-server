@@ -26,6 +26,8 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { EndPointRoom } from '../interfacesGeoContext'
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
+import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -66,13 +68,13 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 
     let nodes = [];
     try {
-
-      let room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      let room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(room);
       if (room.getType().get() === "geographicRoom") {
 
-        var endpoints = await room.getChildren("hasEndPoint");
+        var endpoints = await room.getChildren(["hasEndPoint", SpinalBmsEndpoint.relationName]);
 
         for (const endpoint of endpoints) {
           var element = await endpoint.element.load()

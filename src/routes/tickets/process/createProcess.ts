@@ -28,6 +28,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { Workflow } from '../interfacesWorkflowAndTickets'
 import { serviceTicketPersonalized } from 'spinal-service-ticket'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
   * @swagger
@@ -67,7 +68,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.post("/api/v1/workflow/:id/create_process", async (req, res, next) => {
     try {
-      var workflow: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var workflow: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(workflow)
 

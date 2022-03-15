@@ -26,6 +26,7 @@ import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalEventService } from "spinal-env-viewer-task-service";
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
@@ -56,7 +57,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 */
   app.delete("/api/v1/event/:eventId/delete", async (req, res, next) => {
     try {
-      var event: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.eventId, 10));
+      const profileId = getProfileId(req);
+      var event: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.eventId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(event)
       if (event.getType().get() === "SpinalEvent") {

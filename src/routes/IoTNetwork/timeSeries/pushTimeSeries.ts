@@ -28,6 +28,7 @@ import spinalServiceTimeSeries from '../spinalTimeSeries'
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import * as moment from 'moment'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
 
   /**
@@ -69,7 +70,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/endpoint/:id/timeSeries/push", async (req, res, next) => {
 
     try {
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id))
+      const profileId = getProfileId(req);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(node);
 

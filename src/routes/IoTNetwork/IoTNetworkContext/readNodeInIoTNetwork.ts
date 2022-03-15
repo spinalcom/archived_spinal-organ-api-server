@@ -27,6 +27,7 @@ import { findOneInContext } from '../../../utilities/findOneInContext';
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { IoTNetwork } from '../interfacesEndpointAndTimeSeries'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -69,8 +70,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/IoTNetworkContext/:IoTNetworkId/node/:nodeId/read", async (req, res, next) => {
     try {
-      var IoTNetwork: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IoTNetworkId, 10));
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10));
+      const profileId = getProfileId(req);
+      var IoTNetwork: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IoTNetworkId, 10), profileId);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(node);
 

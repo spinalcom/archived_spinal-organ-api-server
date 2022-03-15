@@ -30,6 +30,7 @@ import {
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceTicketPersonalized } from 'spinal-service-ticket';
+import { getProfileId } from '../../utilities/requestUtilities';
 module.exports = function (
   logger,
   app: express.Express,
@@ -69,8 +70,9 @@ module.exports = function (
   app.get('/api/v1/node/:id/ticket_list', async (req, res, next) => {
     let nodes = [];
     try {
+      const profileId = getProfileId(req);
       var node: SpinalNode<any> = await spinalAPIMiddleware.load(
-        parseInt(req.params.id, 10)
+        parseInt(req.params.id, 10), profileId
       );
       //@ts-ignore
       SpinalGraphService._addNode(node);
@@ -113,7 +115,7 @@ module.exports = function (
           priority: ticket.info.priority.get(),
           creationDate: ticket.info.creationDate.get(),
           userName:
-            ticket.info.user == undefined ? '' : ticket.info.user.name.get(),
+            ticket.info.user ? ticket.info.user.username?.get() || ticket.info.user.name?.get() || "" : "",
           gmaoId:
             ticket.info.gmaoId == undefined ? '' : ticket.info.gmaoId.get(),
           gmaoDateCreation:

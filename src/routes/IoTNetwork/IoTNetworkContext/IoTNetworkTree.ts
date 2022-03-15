@@ -27,6 +27,7 @@ import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { IoTNetworkTree } from '../interfacesEndpointAndTimeSeries'
 import { recTree } from '../../../utilities/recTree'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
   /**
@@ -63,7 +64,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     var IoTNetworks: IoTNetworkTree;
 
     try {
-      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       if (IoTNetwork instanceof SpinalContext) {
         IoTNetworks = {
           dynamicId: IoTNetwork._server_id,

@@ -31,6 +31,7 @@ import { verifDate } from "../../../utilities/dateFunctions";
 
 import * as express from 'express';
 import * as moment from 'moment'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {  /**
   /**
@@ -79,8 +80,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.get("/api/v1/endpoint/:id/timeSeries/read/:begin/:end", async (req, res, next) => {
 
     try {
-
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(node);
 

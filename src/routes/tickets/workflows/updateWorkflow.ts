@@ -25,6 +25,7 @@
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -67,8 +68,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.put("/api/v1/workflow/:id/update", async (req, res, next) => {
 
     try {
-      var workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
-      var childrens = await spinalAPIMiddleware.getGraph().getChildren("hasContext");
+      const profileId = getProfileId(req);
+      var workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
+      var childrens = await spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
 
       for (const child of childrens) {
         if (child.getName().get() === req.body.newNameWorkflow) {

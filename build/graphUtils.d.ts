@@ -1,3 +1,4 @@
+import { SpinalGraph } from 'spinal-model-graph';
 import { SpinalNode, SpinalContext } from 'spinal-env-viewer-graph-service';
 import { Server } from "socket.io";
 import { ISubscribeOptions } from './lib';
@@ -8,12 +9,13 @@ declare class SpinalGraphUtils {
     constructor();
     init(conn: any): Promise<any>;
     setIo(io: Server): void;
-    getNode(nodeId: string | number, contextId?: string | number): Promise<SpinalNode<any>>;
-    getNodeWithServerId(server_id: number): Promise<any>;
-    getNodeWithStaticId(nodeId: string, contextId?: string | number): Promise<SpinalNode<any>>;
+    getProfileGraph(profileId: string): SpinalGraph<any>;
+    getNode(nodeId: string, contextId?: string, profileId?: string): Promise<SpinalNode<any>>;
+    getNodeWithStaticId(nodeId: string, contextId?: string, profileId?: string): Promise<SpinalNode<any>>;
     bindNode(node: SpinalNode<any>, context: SpinalContext<any>, options: ISubscribeOptions, eventName?: string): Promise<void>;
     bindContextTree(startNode: SpinalNode<any>, context: SpinalContext<any>): void;
     bindChildNotInContext(node: SpinalNode<any>): Promise<void>;
+    profileHasAccess(profileId: string, context: SpinalContext<any>, node?: SpinalNode<any>): boolean | Error;
     private _bindAllChild;
     private _bindChildInContext;
     private _getRelationNameNotInContext;

@@ -28,6 +28,7 @@ import { Floor } from '../interfacesGeoContext'
 import { SpinalNode } from 'spinal-model-graph';
 import { NODE_TO_CATEGORY_RELATION } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -79,7 +80,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.get("/api/v1/floor/:id/reference_Objects_list", async (req, res, next) => {
 
     try {
-      var floor: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+
+      var floor: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(floor)
       let referenceObjets = await floor.getChildren("hasReferenceObject");

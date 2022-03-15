@@ -27,6 +27,8 @@ import * as express from 'express';
 import { Equipement } from '../interfacesGeoContext'
 import { SpinalNode } from 'spinal-model-graph';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { profile } from 'console';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -66,7 +68,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     let nodes = [];
     try {
-      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(room)
 

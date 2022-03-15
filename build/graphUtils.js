@@ -8,13 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.spinalGraphUtils = void 0;
 /*
@@ -47,6 +40,7 @@ const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_model_timeseries_1 = require("spinal-model-timeseries");
 const lodash = require("lodash");
 const lib_1 = require("./lib");
+const spinalAPIMiddleware_1 = require("./spinalAPIMiddleware");
 const relationToExclude = [spinal_model_timeseries_1.SpinalTimeSeries.relationName];
 // export enum bindType {
 //     all,
@@ -63,65 +57,48 @@ class SpinalGraphUtils {
     }
     init(conn) {
         return __awaiter(this, void 0, void 0, function* () {
-            // await SpinalGraphService.setGraph(graph);
             this.spinalConnection = conn;
         });
     }
     setIo(io) {
         this.io = io;
     }
-    getNode(nodeId, contextId) {
+    getProfileGraph(profileId) {
+        return spinalAPIMiddleware_1.spinalAPIMiddlewareInstance.getGraph(profileId);
+    }
+    // public async getNode(nodeId: string | number, contextId?: string | number): Promise<SpinalNode<any>> {
+    //     //@ts-ignore
+    //     if (!isNaN(nodeId)) {
+    //         const node = await this.getNodeWithServerId(<number>nodeId);
+    //         //@ts-ignore
+    //         if (node && node instanceof SpinalNode) SpinalGraphService._addNode(node);
+    //         return node;
+    //     }
+    //     return this.getNodeWithStaticId(nodeId.toString(), contextId);
+    // }
+    getNode(nodeId, contextId, profileId) {
         return __awaiter(this, void 0, void 0, function* () {
             //@ts-ignore
             if (!isNaN(nodeId)) {
-                const node = yield this.getNodeWithServerId(nodeId);
-                //@ts-ignore
-                if (node && node instanceof spinal_env_viewer_graph_service_1.SpinalNode)
-                    spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
-                return node;
+                const server_id = parseInt(nodeId);
+                return spinalAPIMiddleware_1.spinalAPIMiddlewareInstance.load(server_id, profileId);
             }
-            return this.getNodeWithStaticId(nodeId.toString(), contextId);
+            return this.getNodeWithStaticId(nodeId.toString(), contextId, profileId);
         });
     }
-    getNodeWithServerId(server_id) {
-        return new Promise((resolve) => {
-            if (typeof spinal_core_connectorjs_type_1.FileSystem._objects[server_id] !== "undefined") {
-                return resolve(spinal_core_connectorjs_type_1.FileSystem._objects[server_id]);
-            }
-            this.spinalConnection.load_ptr(server_id, (node) => {
-                resolve(node);
-            });
-        });
-    }
-    getNodeWithStaticId(nodeId, contextId) {
-        var e_1, _a;
+    // public getNodeWithServerId(server_id: number): Promise<any> {
+    //     return new Promise((resolve) => {
+    //         if (typeof FileSystem._objects[server_id] !== "undefined") {
+    //             return resolve(FileSystem._objects[server_id]);
+    //         }
+    //         this.spinalConnection.load_ptr(server_id, (node) => {
+    //             resolve(node);
+    //         })
+    //     });
+    // }
+    getNodeWithStaticId(nodeId, contextId, profileId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!contextId) {
-                const ref = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getNodeAsync(nodeId.toString());
-                if (ref) {
-                    return spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(ref.id.get());
-                }
-            }
-            const context = yield this.getNode(contextId);
-            if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext) {
-                try {
-                    for (var _b = __asyncValues(context.visitChildrenInContext(context)), _c; _c = yield _b.next(), !_c.done;) {
-                        const node = _c.value;
-                        if (node.getId().get() === nodeId) {
-                            // @ts-ignore
-                            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
-                            return node;
-                        }
-                    }
-                }
-                catch (e_1_1) { e_1 = { error: e_1_1 }; }
-                finally {
-                    try {
-                        if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-                    }
-                    finally { if (e_1) throw e_1.error; }
-                }
-            }
+            return spinalAPIMiddleware_1.spinalAPIMiddlewareInstance.getNodeWithStaticId(nodeId, contextId, profileId);
         });
     }
     bindNode(node, context, options, eventName) {
@@ -170,6 +147,18 @@ class SpinalGraphUtils {
             const children = yield node.getChildren(relations.filter(el => relationToExclude.indexOf(el) !== -1));
             children.forEach((child) => this.bindNode(child, null, {}, eventName));
         });
+    }
+    profileHasAccess(profileId, context, node) {
+        const graph = this.getProfileGraph(profileId);
+        if (!graph)
+            return new Error(`no graph found for ${profileId}`);
+        const contextIds = graph.getChildrenIds();
+        const contextFound = contextIds.find(id => id === context.getId().get());
+        if (!contextFound)
+            return new Error(`Unauthorized: You have not access to ${context.getName().get()}`);
+        if (node && !node.belongsToContext(context))
+            return new Error(`Unauthorized: You have not access to ${node.getName().get()}`);
+        return true;
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     //                                      PRIVATE                                                          //

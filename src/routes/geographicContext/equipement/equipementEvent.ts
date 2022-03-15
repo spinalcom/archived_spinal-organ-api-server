@@ -27,6 +27,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalEventService } from "spinal-env-viewer-task-service";
 import { Event } from '../../calendar/interfacesContextsEvents'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -62,8 +63,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 */
   app.get("/api/v1/equipement/:id/event_list", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
+
       var nodes = [];
-      var equipement: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var equipement: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(equipement)
       if (equipement.getType().get() === "BIMObject") {

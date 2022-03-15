@@ -25,6 +25,7 @@
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -70,12 +71,12 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     var type_list;
     try {
-
-      var contextNode = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10));
+      const profileId = getProfileId(req);
+      var contextNode = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(contextNode);
       var SpinalContextNodeId = contextNode.getId().get();
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10));
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(node);
       var SpinalNodeId = node.getId().get();

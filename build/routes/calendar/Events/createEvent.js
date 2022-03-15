@@ -35,6 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_env_viewer_task_service_1 = require("spinal-env-viewer-task-service");
 const moment = require("moment");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -98,16 +99,17 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.post("/api/v1/event/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var context = yield spinalAPIMiddleware.load(parseInt(req.body.contextId, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var context = yield spinalAPIMiddleware.load(parseInt(req.body.contextId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
-            var groupe = yield spinalAPIMiddleware.load(parseInt(req.body.groupDynamicId, 10));
+            var groupe = yield spinalAPIMiddleware.load(parseInt(req.body.groupDynamicId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(groupe);
-            var node = yield spinalAPIMiddleware.load(parseInt(req.body.nodeDynamicId, 10));
+            var node = yield spinalAPIMiddleware.load(parseInt(req.body.nodeDynamicId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
-            var category = yield spinalAPIMiddleware.load(parseInt(req.body.categoryDynamicId, 10));
+            var category = yield spinalAPIMiddleware.load(parseInt(req.body.categoryDynamicId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(category);
             if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext) {

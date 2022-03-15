@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const findOneInContext_1 = require("../../../utilities/findOneInContext");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -72,7 +73,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.get("/api/v1/IoTNetworkContext/:IoTNetworkId/node/:nodeId/find", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var IoTNetwork = yield spinalAPIMiddleware.load(parseInt(req.params.IoTNetworkId, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var IoTNetwork = yield spinalAPIMiddleware.load(parseInt(req.params.IoTNetworkId, 10), profileId);
             var node = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(req.params.nodeId);
             if (IoTNetwork.getType().get() === "Network" && typeof node === "undefined") {
                 node = yield (0, findOneInContext_1.findOneInContext)(IoTNetwork, IoTNetwork, (n) => n.getId().get() === req.params.nodeId);

@@ -25,6 +25,7 @@ import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { NODE_TO_CATEGORY_RELATION } from "spinal-env-viewer-plugin-documentation-service/dist/Models/constants";
 import { CategoriesAttribute } from './interfacesCategoriesAtrtribut'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -64,7 +65,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     let nodes = [];
 
     try {
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       var childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION);
       for (const child of childrens) {
         let info: CategoriesAttribute = {

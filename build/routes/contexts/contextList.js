@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -59,9 +60,10 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.get("/api/v1/context/list", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         let nodes = [];
         try {
-            var graph = spinalAPIMiddleware.getGraph();
-            var relationNames = spinalAPIMiddleware.getGraph().getRelationNames();
-            var childrens = yield spinalAPIMiddleware.getGraph().getChildren(relationNames);
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var graph = spinalAPIMiddleware.getGraph(profileId);
+            var relationNames = graph.getRelationNames();
+            var childrens = yield graph.getChildren(relationNames);
             for (const child of childrens) {
                 let info = {
                     dynamicId: child._server_id,

@@ -31,6 +31,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
 import getFiles from '../../../utilities/getFiles';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -70,8 +71,10 @@ module.exports = function (
    */
   app.get('/api/v1/equipement/:id/file_list', async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
+
       var equipement = await spinalAPIMiddleware.load(
-        parseInt(req.params.id, 10)
+        parseInt(req.params.id, 10), profileId
       );
       //@ts-ignore
       SpinalGraphService._addNode(equipement);

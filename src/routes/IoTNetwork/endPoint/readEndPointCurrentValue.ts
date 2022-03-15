@@ -28,6 +28,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { CurrentValue } from '../interfacesEndpointAndTimeSeries'
 import { NetworkService } from 'spinal-model-bmsnetwork'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -64,7 +65,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/endpoint/:id/read", async (req, res, next) => {
     try {
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+      const profileId = getProfileId(req);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(node);
       var element = await node.element.load()

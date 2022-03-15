@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/constants");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -91,7 +92,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   *         description: Bad request
       */
     app.put("/api/v1/node/:idNode/category/:idCategory/attribute/:attributName/update", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-        let node = yield spinalAPIMiddleware.load(parseInt(req.params.idNode, 10));
+        const profileId = (0, requestUtilities_1.getProfileId)(req);
+        let node = yield spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId);
         let childrens = yield node.getChildren(constants_1.NODE_TO_CATEGORY_RELATION);
         let nodes = [];
         let category = childrens.find(el => (el.getId().get() === req.params.idCategory));

@@ -28,6 +28,7 @@ import * as express from 'express';
 import { NetworkService, ConfigService } from 'spinal-model-bmsnetwork'
 import getInstance from "../networkService";
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 
@@ -73,8 +74,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/Network/create", async (req, res, next) => {
 
     try {
-
-      var context = await spinalAPIMiddleware.load(parseInt(req.body.IoTNetworkContext_DynamicId))
+      const profileId = getProfileId(req);
+      var context = await spinalAPIMiddleware.load(parseInt(req.body.IoTNetworkContext_DynamicId), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(context);
 
@@ -84,7 +85,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
         networkName: req.body.NetworkName,
         networkType: req.body.NetworkTypeName
       }
-      getInstance().init(spinalAPIMiddleware.getGraph(), configService, true);
+      getInstance().init(spinalAPIMiddleware.getGraph(profileId), configService, true);
     } catch (error) {
       console.error(error)
       res.status(400).send()

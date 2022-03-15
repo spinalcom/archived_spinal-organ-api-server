@@ -33,6 +33,7 @@ import { serviceTicketPersonalized } from 'spinal-service-ticket';
 import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
 import getFiles from '../../../utilities/getFiles';
 import { LOGS_EVENTS } from 'spinal-service-ticket/dist/Constants';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -73,7 +74,8 @@ module.exports = function (
   app.get('/api/v1/room/:id/ticket_list', async (req, res, next) => {
     let nodes = [];
     try {
-      var room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(room);
 

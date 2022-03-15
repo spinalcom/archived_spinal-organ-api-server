@@ -27,6 +27,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
 import { serviceTicketPersonalized } from 'spinal-service-ticket'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
 * @swagger
@@ -59,7 +60,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 */
   app.get("/api/v1/ticket/:ticketId/find_entity", async (req, res, next) => {
     try {
-      var _ticket = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10));
+      const profileId = getProfileId(req);
+      var _ticket = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(_ticket)
 

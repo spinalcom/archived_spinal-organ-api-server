@@ -26,6 +26,7 @@ import { NODE_TO_CATEGORY_RELATION } from "spinal-env-viewer-plugin-documentatio
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { NodeAttribut, Attributs } from './interfacesAttributs'
+import { getProfileId } from "../../utilities/requestUtilities";
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -87,7 +88,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.put("/api/v1/node/:idNode/category/:idCategory/attribute/:attributName/update", async (req, res, next) => {
 
-    let node = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10))
+    const profileId = getProfileId(req);
+    let node = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId)
     let childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION)
     let nodes = []
     let category = childrens.find(el => (

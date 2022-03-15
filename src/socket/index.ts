@@ -33,6 +33,7 @@ const serverOption: any = { pingTimeout: 30000, maxHttpBufferSize: 1e8, transpor
 export function runSocketServer(app: any) {
 
     const io = new Server(app, serverOption);
+
     setMiddleware(io);
     spinalGraphUtils.setIo(io);
     connectionHandler(io);

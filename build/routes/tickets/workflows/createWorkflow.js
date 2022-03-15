@@ -33,6 +33,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 const spinal_service_ticket_1 = require("spinal-service-ticket");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -63,7 +64,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.post("/api/v1/workflow/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var childrens = yield spinalAPIMiddleware.getGraph().getChildren("hasContext");
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var childrens = yield spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
             for (const child of childrens) {
                 if (child.getName().get() === req.body.nameWorkflow) {
                     return res.status(400).send("the name context already exists");

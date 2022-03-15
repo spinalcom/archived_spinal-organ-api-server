@@ -27,6 +27,7 @@ import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-ser
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { CategoriesAttribute } from './interfacesCategoriesAtrtribut'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -74,9 +75,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   */
   app.put("/api/v1/node/:nodeId/categoryById/:categoryId/update", async (req, res, next) => {
     try {
-
-      let node = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10))
-      let category = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10))
+      const profileId = getProfileId(req);
+      let node = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId)
+      let category = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10), profileId)
       const result = await serviceDocumentation._categoryExist(node, category.getName().get());
       var newCatgoryName = req.body.categoryName
       if (result === undefined) {

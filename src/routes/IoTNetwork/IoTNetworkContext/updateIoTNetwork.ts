@@ -25,6 +25,7 @@
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -67,7 +68,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.put("/api/v1/IoTNetworkContext/:id/update", async (req, res, next) => {
 
     try {
-      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+      const profileId = getProfileId(req);
+      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
       if (IoTNetwork.getType().get() === "Network") {
         IoTNetwork.info.name.set(req.body.newNameIoTNetwork)
       }

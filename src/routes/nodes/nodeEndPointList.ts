@@ -27,6 +27,8 @@ import * as express from 'express';
 import { EndPointNode } from './interfacesNodes'
 import { SpinalGraph } from 'spinal-model-graph';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../utilities/requestUtilities';
+import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -67,11 +69,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 
     let nodes = [];
     try {
-
-      let node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      let node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(node);
-      var endpoints = await node.getChildren("hasEndPoint");
+      var endpoints = await node.getChildren(["hasEndPoint", SpinalBmsEndpoint.relationName]);
       console.log(endpoints);
 
 

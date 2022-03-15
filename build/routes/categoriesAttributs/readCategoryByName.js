@@ -33,6 +33,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 const spinal_env_viewer_plugin_documentation_service_1 = require("spinal-env-viewer-plugin-documentation-service");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -71,7 +72,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.get("/api/v1/node/:nodeId/categoryByName/:categoryName/read", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         let info;
         try {
-            let node = yield spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            let node = yield spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId);
             const result = yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation._categoryExist(node, req.params.categoryName);
             if (result === undefined) {
                 res.status(400).send("category not found in node");

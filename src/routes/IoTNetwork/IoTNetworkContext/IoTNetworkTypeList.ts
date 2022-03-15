@@ -25,6 +25,7 @@
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -58,7 +59,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.get("/api/v1/IoTNetworkContext/:id/nodeTypeList", async (req, res, next) => {
 
     try {
-      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var IoTNetwork = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       var SpinalContextId = IoTNetwork.getId().get();
       if (IoTNetwork.getType().get() === "Network") {
         var type_list = await SpinalGraphService.browseAndClassifyByTypeInContext(SpinalContextId, SpinalContextId);

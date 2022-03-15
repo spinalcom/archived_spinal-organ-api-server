@@ -26,6 +26,7 @@ import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -66,7 +67,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   */
   app.put("/api/v1/node/:id/update_note", async (req, res, next) => {
     try {
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(node)
       var notes = await serviceDocumentation.getNotes(node)

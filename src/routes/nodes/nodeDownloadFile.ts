@@ -36,6 +36,7 @@ import { ServiceUser } from 'spinal-service-user';
 var http = require('http');
 var fs = require('fs');
 import config from '../../../config';
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -70,7 +71,8 @@ module.exports = function (
 
   app.use('/api/v1/node/:id/download_file', async (req, res, next) => {
     try {
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       var p = await down(node);
       res.download(p, (error) => { });
     } catch (error) {

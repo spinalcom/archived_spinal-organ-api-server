@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -60,7 +61,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
         let nodes = [];
         let contextNetwork;
         try {
-            var childrens = yield spinalAPIMiddleware.getGraph().getChildren("hasContext");
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var childrens = yield spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
             for (const child of childrens) {
                 if (child.getType().get() === "Network") {
                     contextNetwork = child;

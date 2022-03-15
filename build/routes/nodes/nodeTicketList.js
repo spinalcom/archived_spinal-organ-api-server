@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
      * @swagger
@@ -66,9 +67,11 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
      *         description: Bad request
      */
     app.get('/api/v1/node/:id/ticket_list', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
         let nodes = [];
         try {
-            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
             var ticketList = yield node.getChildren('SpinalSystemServiceTicketHasTicket');
@@ -101,7 +104,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     type: ticket.getType().get(),
                     priority: ticket.info.priority.get(),
                     creationDate: ticket.info.creationDate.get(),
-                    userName: ticket.info.user == undefined ? '' : ticket.info.user.name.get(),
+                    userName: ticket.info.user ? ((_a = ticket.info.user.username) === null || _a === void 0 ? void 0 : _a.get()) || ((_b = ticket.info.user.name) === null || _b === void 0 ? void 0 : _b.get()) || "" : "",
                     gmaoId: ticket.info.gmaoId == undefined ? '' : ticket.info.gmaoId.get(),
                     gmaoDateCreation: ticket.info.gmaoDateCreation == undefined
                         ? ''

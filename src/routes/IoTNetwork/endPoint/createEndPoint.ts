@@ -27,6 +27,7 @@ import * as express from 'express';
 import { NetworkService, ConfigService } from 'spinal-model-bmsnetwork'
 import getInstance from "../networkService";
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
 
@@ -72,7 +73,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/endpoint/create", async (req, res, next) => {
 
     try {
-      var device = await spinalAPIMiddleware.load(parseInt(req.body.deviceDynamicId))
+      const profileId = getProfileId(req);
+      var device = await spinalAPIMiddleware.load(parseInt(req.body.deviceDynamicId), profileId)
       //@ts-ignore
       SpinalGraphService._addNode(device);
 
@@ -91,7 +93,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
         networkName: "NetworkVirtual",
         networkType: "NetworkVirtual"
       }
-      getInstance().init(spinalAPIMiddleware.getGraph(), configService, true)
+      getInstance().init(spinalAPIMiddleware.getGraph(profileId), configService, true)
       //@ts-ignore
       getInstance().createNewBmsEndpoint(device.getId().get(), obj)
 

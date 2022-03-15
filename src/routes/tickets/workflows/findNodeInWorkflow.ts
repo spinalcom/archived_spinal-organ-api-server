@@ -27,6 +27,7 @@ import { findOneInContext } from '../../../utilities/findOneInContext';
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { Workflow } from '../interfacesWorkflowAndTickets'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -68,7 +69,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/workflow/:workflowId/node/:nodeId/find", async (req, res, next) => {
     try {
-      var workflow: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10));
+      const profileId = getProfileId(req);
+      var workflow: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10), profileId);
       if (req.params.nodeId) {
 
       }

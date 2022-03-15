@@ -25,10 +25,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EXCLUDES_TYPES = exports.EVENT_NAMES = exports.ERROR_EVENT = exports.PUBLISH_EVENT = exports.SUBSCRIBED = exports.SUBSCRIBE_EVENT = exports.NOK_STATUS = exports.OK_STATUS = void 0;
 const constants_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/constants");
+const spinal_model_timeseries_1 = require("spinal-model-timeseries");
 exports.OK_STATUS = "success";
 exports.NOK_STATUS = "error";
 exports.SUBSCRIBE_EVENT = "subscribe";
-exports.SUBSCRIBED = "subscibed";
+exports.SUBSCRIBED = "subscribed";
 exports.PUBLISH_EVENT = "publish";
 exports.ERROR_EVENT = "exception";
 var EVENT_NAMES;
@@ -39,5 +40,5 @@ var EVENT_NAMES;
     EVENT_NAMES["childrenRemoved"] = "childrenRemoved";
     EVENT_NAMES["addChildInContext"] = "addChildInContext";
 })(EVENT_NAMES = exports.EVENT_NAMES || (exports.EVENT_NAMES = {}));
-exports.EXCLUDES_TYPES = [constants_1.URL_TYPE, constants_1.NOTE_TYPE, constants_1.CATEGORY_TYPE, constants_1.ATTRIBUTE_TYPE];
+exports.EXCLUDES_TYPES = [constants_1.URL_TYPE, constants_1.NOTE_TYPE, constants_1.CATEGORY_TYPE, constants_1.ATTRIBUTE_TYPE, spinal_model_timeseries_1.SpinalTimeSeries.nodeTypeName];
 //# sourceMappingURL=constants.js.map

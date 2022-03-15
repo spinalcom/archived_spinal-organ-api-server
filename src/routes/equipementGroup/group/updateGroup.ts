@@ -26,6 +26,7 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
  * @swagger
@@ -85,13 +86,15 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.put("/api/v1/equipementsGroup/:contextId/category/:categoryId/group/:groupId/update", async (req, res, next) => {
 
     try {
-      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10));
+      const profileId = getProfileId(req);
+
+      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(context)
-      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10));
+      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(category)
-      var group: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.groupId, 10));
+      var group: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.groupId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(group)
 

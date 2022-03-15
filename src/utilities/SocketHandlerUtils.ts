@@ -28,6 +28,7 @@ import { SpinalContext, SpinalNode } from "spinal-model-graph";
 import { spinalGraphUtils } from "../graphUtils";
 
 
+
 export function structureDataFunc(args: any[]): { ids: INodeId[], options: ISubscribeOptions } {
 
     let ids = lodash.flattenDeep(args.slice(0, args.length - 1));
@@ -46,13 +47,44 @@ export function structureDataFunc(args: any[]): { ids: INodeId[], options: ISubs
     }
 }
 
-export function getNodesFunc(ids: INodeId[]): Promise<{ [key: string]: INodeData }> {
+export function getNodesAndRooms(ids: INodeId[], profileId: string, options: ISubscribeOptions) {
+    const promises = ids.map(async (el) => {
+        try {
+            _checkIdError(el);
+            //@ts-ignore
+            const context = await spinalGraphUtils.getNode(el.contextId, el.contextId, profileId);
+            //@ts-ignore
+            const node = await spinalGraphUtils.getNode(el.nodeId, el.contextId, profileId);
+            _checkNodesExistance([{ id: el.contextId, node: context }, { id: el.nodeId, node: node }]);
+
+            const accessError = spinalGraphUtils.profileHasAccess(profileId, context, node);
+            if (accessError instanceof Error) throw accessError;
+
+            const eventNames = _getRooms(context, node, options);
+
+            return {
+                error: null, node, context, ids: { contextId: el.contextId, nodeId: el.nodeId }, status: OK_STATUS, eventNames
+            };
+
+        } catch (error) {
+            return { error: error.message, ids: { contextId: el.contextId, nodeId: el.nodeId }, status: NOK_STATUS };
+        }
+
+    })
+
+    return Promise.all(promises);
+}
+
+
+export function getNodeFunc(ids: INodeId[]): Promise<{ [key: string]: INodeData }> {
     const obj = {};
 
     const promises = ids.map(async ({ nodeId, contextId }) => {
         let context;
+        //@ts-ignore
         if (contextId) context = await spinalGraphUtils.getNode(contextId);
         let tempContextId = context && context instanceof SpinalContext ? contextId : undefined;
+        //@ts-ignore
         const node = await spinalGraphUtils.getNode(nodeId, tempContextId);
 
         obj[nodeId] = {
@@ -76,10 +108,12 @@ export function _getRoomNameFunc(nodeId: string | number, contextId: string | nu
     let error = null;
 
     if (!node || !(node instanceof SpinalNode)) {
-        error = !node ? `${nodeId} is not found` : `${nodeId} must be a spinalNode, SpinalContext`;
+        error = !node ? `${nodeId} is not found` : `${nodeId} must be a spinalNode or SpinalContext`;
         // error = new Error(message);
         return { error, nodeId, status: NOK_STATUS };
     }
+
+
 
     let roomId = node.getId().get();
     let eventNames = [roomId];
@@ -103,6 +137,10 @@ export function _getRoomNameFunc(nodeId: string | number, contextId: string | nu
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////
+//                                  PRIVATE                                      //
+///////////////////////////////////////////////////////////////////////////////////
+
 function _formatId(id: string | number | INodeId): INodeId {
 
     if (typeof id === "string") {
@@ -120,4 +158,27 @@ function _formatId(id: string | number | INodeId): INodeId {
     }
 
     if (id.nodeId) return id;
+}
+
+function _checkIdError(ids: INodeId): void {
+    if (!ids?.contextId) throw new Error("contextId is required");
+    if (!ids?.nodeId) throw new Error("nodeId is required");
+}
+
+function _checkNodesExistance(nodes: { id: string | number, node: SpinalNode<any> }[]): void {
+    if (!Array.isArray(nodes)) nodes = [nodes];
+    for (const { id, node } of nodes) {
+        if (!node) throw Error(`no node found for ${id}`);
+    }
+}
+
+function _getRooms(context: SpinalContext<any>, node: SpinalNode<any>, options: ISubscribeOptions) {
+    let roomId = node.getId().get();
+    let eventNames = [roomId];
+    if (options.subscribeChildren && [IScope.in_context, IScope.tree_in_context].indexOf(options.subscribeChildScope) !== -1) {
+        const namespaceId = context.getId().get();
+        eventNames.push(`${namespaceId}:${roomId}`)
+    }
+
+    return eventNames;
 }

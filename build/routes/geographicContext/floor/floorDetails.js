@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/constants");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -65,7 +66,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.get("/api/v1/floor/:id/floor_details", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var floor = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var floor = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             var rooms = yield floor.getChildren("hasGeographicRoom");
             let sommes = 0;
             let _bimObjects = [];

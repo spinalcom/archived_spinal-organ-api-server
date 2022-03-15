@@ -23,11 +23,12 @@
  */
 
 import { URL_TYPE, NOTE_TYPE, CATEGORY_TYPE, ATTRIBUTE_TYPE } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
+import { SpinalTimeSeries } from 'spinal-model-timeseries';
 
 export const OK_STATUS: string = "success";
 export const NOK_STATUS: string = "error";
 export const SUBSCRIBE_EVENT: string = "subscribe";
-export const SUBSCRIBED: string = "subscibed";
+export const SUBSCRIBED: string = "subscribed";
 export const PUBLISH_EVENT: string = "publish";
 export const ERROR_EVENT: string = "exception";
 
@@ -39,4 +40,4 @@ export enum EVENT_NAMES {
     addChildInContext = "addChildInContext"
 }
 
-export const EXCLUDES_TYPES = [URL_TYPE, NOTE_TYPE, CATEGORY_TYPE, ATTRIBUTE_TYPE]
+export const EXCLUDES_TYPES = [URL_TYPE, NOTE_TYPE, CATEGORY_TYPE, ATTRIBUTE_TYPE, SpinalTimeSeries.nodeTypeName];

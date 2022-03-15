@@ -27,6 +27,7 @@ import * as express from 'express';
 import { childrensNode, parentsNode } from '../../utilities/corseChildrenAndParentNode'
 import { Node } from './interfacesNodes'
 import { SpinalNode } from 'spinal-model-graph';
+import { getProfileId } from '../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
   /**
@@ -61,8 +62,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/node/:id/read", async (req, res, next) => {
     try {
-
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       var childrens_list = childrensNode(node);
       var parents_list = await parentsNode(node)
       var info: Node = {

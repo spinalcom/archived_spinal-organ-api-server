@@ -34,22 +34,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subscribeHandler = void 0;
 const SocketHandlerUtils_1 = require("../../utilities/SocketHandlerUtils");
-const graphUtils_1 = require("../../graphUtils");
 const lib_1 = require("../../lib");
+const spinalAPIMiddleware_1 = require("../../spinalAPIMiddleware");
+const graphUtils_1 = require("../../graphUtils");
+const { runLocalServer } = require("../../../config");
 function subscribeHandler(io, socket) {
     socket.on(lib_1.SUBSCRIBE_EVENT, (...args) => __awaiter(this, void 0, void 0, function* () {
-        console.log("received subscribe request from", socket.id);
+        var _a;
+        let profileId = (_a = socket.handshake.auth.token) === null || _a === void 0 ? void 0 : _a.profileId;
+        if (!profileId && (runLocalServer == "true" || runLocalServer === true))
+            profileId = spinalAPIMiddleware_1.spinalAPIMiddlewareInstance.principaleGraphId;
         const { ids, options } = (0, SocketHandlerUtils_1.structureDataFunc)(args);
-        const nodes = yield (0, SocketHandlerUtils_1.getNodesFunc)(ids);
-        const result = ids.map(({ nodeId, contextId }) => (0, SocketHandlerUtils_1._getRoomNameFunc)(nodeId, contextId, nodes, options));
-        socket.emit(lib_1.SUBSCRIBED, result.length == 1 ? result[0] : result);
-        result.forEach(({ error, nodeId, status, eventNames }) => {
+        const responseData = yield (0, SocketHandlerUtils_1.getNodesAndRooms)(ids, profileId, options);
+        const responseFormatted = responseData.map(({ error, ids, status, eventNames }) => ({ error, ids, status, eventNames }));
+        socket.emit(lib_1.SUBSCRIBED, responseFormatted.length == 1 ? responseFormatted[0] : responseFormatted);
+        responseData.forEach(({ error, node, context, status, eventNames }) => {
             if (!error && status === lib_1.OK_STATUS) {
-                const { node, contextNode } = nodes[nodeId];
                 eventNames.forEach(roomId => socket.join(roomId));
-                graphUtils_1.spinalGraphUtils.bindNode(node, contextNode, options);
+                graphUtils_1.spinalGraphUtils.bindNode(node, context, options);
             }
         });
+        // const nodes = await getNodesFunc(ids);
+        // const result = ids.map(({ nodeId, contextId }) => _getRoomNameFunc(nodeId, contextId, nodes, options))
+        // socket.emit(SUBSCRIBED, result.length == 1 ? result[0] : result);
+        // result.forEach(({ error, nodeId, status, eventNames }) => {
+        //     if (!error && status === OK_STATUS) {
+        //         const { node, contextNode } = nodes[nodeId];
+        //         eventNames.forEach(roomId => socket.join(roomId));
+        //         spinalGraphUtils.bindNode(node, contextNode, options)
+        //     }
+        // });
     }));
 }
 exports.subscribeHandler = subscribeHandler;

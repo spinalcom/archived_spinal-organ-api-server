@@ -25,6 +25,7 @@ import { SpinalContext, SpinalGraphService, SpinalNode } from 'spinal-env-viewer
 import spinalServiceTimeSeries from '../spinalTimeSeries'
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {  /**
   /**
@@ -61,8 +62,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.get("/api/v1/endpoint/:id/timeSeries/readCurrentYear", async (req, res, next) => {
 
     try {
-
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
       // @ts-ignore
       SpinalGraphService._addNode(node);
       const timeSeriesIntervalDate = spinalServiceTimeSeries().getDateFromLastDays(365)

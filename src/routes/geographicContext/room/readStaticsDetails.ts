@@ -29,6 +29,7 @@ import { SpinalNode, SpinalGraphService, SpinalContext } from 'spinal-env-viewer
 import { NODE_TO_CATEGORY_RELATION } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
 import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service'
 import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -64,9 +65,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/room/:id/read_static_details", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
+
       let equipements = [];
       let CategorieAttributsList = []
-      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(room)
       if (room.getType().get() === "geographicRoom") {

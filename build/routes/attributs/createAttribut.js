@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const spinal_env_viewer_plugin_documentation_service_1 = require("spinal-env-viewer-plugin-documentation-service");
 const constants_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/constants");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -88,8 +89,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.post("/api/v1/node/:IdNode/category/:IdCategory/attribut/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            let node = yield spinalAPIMiddleware.load(parseInt(req.params.IdNode, 10));
-            let category = yield spinalAPIMiddleware.load(parseInt(req.params.IdCategory, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            let node = yield spinalAPIMiddleware.load(parseInt(req.params.IdNode, 10), profileId);
+            let category = yield spinalAPIMiddleware.load(parseInt(req.params.IdCategory, 10), profileId);
             let attributeLabel = req.body.attributeLabel;
             let attributeValue = req.body.attributeValue;
             let attributeType = req.body.attributeType;

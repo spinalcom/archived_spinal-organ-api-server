@@ -35,6 +35,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_env_viewer_task_service_1 = require("spinal-env-viewer-task-service");
 const dateFunctions_1 = require("../../../utilities/dateFunctions");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -84,8 +85,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.post("/api/v1/room/:id/event_list", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
             var nodes = [];
-            var room = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            var room = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(room);
             if (room.getType().get() === "geographicRoom") {

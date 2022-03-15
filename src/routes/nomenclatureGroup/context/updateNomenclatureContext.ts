@@ -26,7 +26,8 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
-import {spinalNomenclatureService} from "spinal-env-viewer-plugin-nomenclature-service"
+import { spinalNomenclatureService } from "spinal-env-viewer-plugin-nomenclature-service"
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
@@ -71,18 +72,19 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.put("/api/v1/nomenclatureGroup/:id/update", async (req, res, next) => {
 
     try {
-      var groupContext: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var groupContext: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(groupContext)
       if (groupContext.getType().get() === "AttributeConfigurationGroupContext") {
-        var contextUpdated = await spinalNomenclatureService.updateContext(groupContext.getId().get(),req.body.newNomenclatureContextName)
-     console.log(contextUpdated);
-     var info = {
-      dynamicId: contextUpdated._server_id,
-      staticId: contextUpdated.getId().get(),
-      name: contextUpdated.getName().get(),
-      type: contextUpdated.getType().get(),
-      }
+        var contextUpdated = await spinalNomenclatureService.updateContext(groupContext.getId().get(), req.body.newNomenclatureContextName)
+        console.log(contextUpdated);
+        var info = {
+          dynamicId: contextUpdated._server_id,
+          staticId: contextUpdated.getId().get(),
+          name: contextUpdated.getName().get(),
+          type: contextUpdated.getType().get(),
+        }
       } else {
         res.status(400).send("node is not type of AttributeConfigurationGroupContext ");
       }

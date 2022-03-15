@@ -27,6 +27,7 @@ import * as express from 'express';
 import { Room } from '../interfacesGeoContext'
 import { SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { NODE_TO_CATEGORY_RELATION } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -62,9 +63,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/room/:id/read_details", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
+
       let area = 0
       let _bimObjects = [];
-      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       const t: { bimFileId: string, bimFileName: string, dbids: number[] }[] = []
       var bimFileId: string
       //@ts-ignore

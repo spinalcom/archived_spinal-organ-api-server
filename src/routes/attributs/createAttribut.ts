@@ -27,6 +27,7 @@ import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 
 import * as express from 'express';
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -84,8 +85,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.post("/api/v1/node/:IdNode/category/:IdCategory/attribut/create", async (req, res, next) => {
     try {
-      let node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IdNode, 10));
-      let category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IdCategory, 10));
+      const profileId = getProfileId(req);
+      let node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IdNode, 10), profileId);
+      let category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.IdCategory, 10), profileId);
       let attributeLabel = req.body.attributeLabel;
       let attributeValue = req.body.attributeValue;
       let attributeType = req.body.attributeType;

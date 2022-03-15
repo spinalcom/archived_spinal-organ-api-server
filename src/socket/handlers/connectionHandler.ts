@@ -27,10 +27,9 @@ import { subscribeHandler } from "./subscribeHandler";
 import { disconnecthandler } from './disconnectionHandler';
 
 
-
 export function connectionHandler(io: Server) {
     io.on("connection", (socket: Socket) => {
-        const { handshake: { address, auth } } = socket;
+        // const { handshake: { address, auth } } = socket;
         subscribeHandler(io, socket);
         disconnecthandler(socket);
     })

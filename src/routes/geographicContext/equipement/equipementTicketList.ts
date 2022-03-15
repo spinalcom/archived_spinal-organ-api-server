@@ -33,6 +33,7 @@ import { Room } from '../interfacesGeoContext';
 import { serviceTicketPersonalized } from 'spinal-service-ticket';
 import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
 import { LOGS_EVENTS } from 'spinal-service-ticket/dist/Constants';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -73,8 +74,10 @@ module.exports = function (
   app.get('/api/v1/equipement/:id/ticket_list', async (req, res, next) => {
     let nodes = [];
     try {
+      const profileId = getProfileId(req);
+
       var equipement = await spinalAPIMiddleware.load(
-        parseInt(req.params.id, 10)
+        parseInt(req.params.id, 10), profileId
       );
       //@ts-ignore
       SpinalGraphService._addNode(equipement);

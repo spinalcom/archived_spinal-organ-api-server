@@ -28,6 +28,7 @@ import * as express from 'express';
 import { serviceTicketPersonalized } from 'spinal-service-ticket'
 import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service'
 import { SpinalBmsEndpoint } from 'spinal-model-bmsnetwork';
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -69,8 +70,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 */
   app.get("/api/v1/analytics/room/:id/status/:option", async (req, res, next) => {
     try {
-
-      var room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var room = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(room)
       var ticketList = [];

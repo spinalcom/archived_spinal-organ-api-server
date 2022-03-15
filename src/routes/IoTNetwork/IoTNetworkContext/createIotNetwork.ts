@@ -26,6 +26,7 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { NetworkService, ConfigService } from 'spinal-model-bmsnetwork'
 import getInstance from "../networkService";
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
  * @swagger
@@ -62,13 +63,14 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/IoTNetworkContext/create", async (req, res, next) => {
 
     try {
+      const profileId = getProfileId(req);
       let configService: ConfigService = {
         contextName: req.body.contextName,
         contextType: "Network",
         networkName: req.body.networkName,
         networkType: "NetworkVirtual"
       }
-      getInstance().init(spinalAPIMiddleware.getGraph(), configService, true)
+      getInstance().init(spinalAPIMiddleware.getGraph(profileId), configService, true)
     } catch (error) {
       console.error(error)
       res.status(400).send()

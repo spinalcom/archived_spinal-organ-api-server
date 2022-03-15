@@ -27,6 +27,7 @@ import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalEventService } from "spinal-env-viewer-task-service";
 import * as moment from 'moment'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 
@@ -94,16 +95,17 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   */
   app.post("/api/v1/event/create", async (req, res, next) => {
     try {
-      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.contextId, 10));
+      const profileId = getProfileId(req);
+      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.contextId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(context)
-      var groupe: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.groupDynamicId, 10));
+      var groupe: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.groupDynamicId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(groupe)
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.nodeDynamicId, 10));
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.nodeDynamicId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(node)
-      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.categoryDynamicId, 10));
+      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.body.categoryDynamicId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(category)
 

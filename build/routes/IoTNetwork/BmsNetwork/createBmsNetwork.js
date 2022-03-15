@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const networkService_1 = require("../networkService");
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -70,7 +71,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.post("/api/v1/Network/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var context = yield spinalAPIMiddleware.load(parseInt(req.body.IoTNetworkContext_DynamicId));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var context = yield spinalAPIMiddleware.load(parseInt(req.body.IoTNetworkContext_DynamicId), profileId);
             // @ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
             let configService = {
@@ -79,7 +81,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 networkName: req.body.NetworkName,
                 networkType: req.body.NetworkTypeName
             };
-            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(), configService, true);
+            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(profileId), configService, true);
         }
         catch (error) {
             console.error(error);

@@ -32,6 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -70,8 +71,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.put("/api/v1/workflow/:id/update", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var workflow = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
-            var childrens = yield spinalAPIMiddleware.getGraph().getChildren("hasContext");
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var workflow = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
+            var childrens = yield spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
             for (const child of childrens) {
                 if (child.getName().get() === req.body.newNameWorkflow) {
                     return res.status(400).send("the name context already exists");

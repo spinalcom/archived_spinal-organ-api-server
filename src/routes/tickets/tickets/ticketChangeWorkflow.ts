@@ -30,6 +30,7 @@ import { Step } from '../interfacesWorkflowAndTickets'
 import { serviceTicketPersonalized } from 'spinal-service-ticket'
 import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
 import { ServiceUser } from "spinal-service-user";
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -73,13 +74,14 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   */
   app.put("/api/v1/ticket/:ticketId/change_workflow", async (req, res, next) => {
     try {
-      var workflow = await spinalAPIMiddleware.load(parseInt(req.body.workflowDynamicId, 10));
+      const profileId = getProfileId(req);
+      var workflow = await spinalAPIMiddleware.load(parseInt(req.body.workflowDynamicId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(workflow)
-      var process = await spinalAPIMiddleware.load(parseInt(req.body.processDynamicId, 10));
+      var process = await spinalAPIMiddleware.load(parseInt(req.body.processDynamicId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(process)
-      var ticket = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10));
+      var ticket = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(ticket)
       await serviceTicketPersonalized.changeTicketProcess(ticket.getId().get(), process.getId().get(), workflow.getId().get())

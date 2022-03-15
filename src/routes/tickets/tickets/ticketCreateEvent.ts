@@ -29,6 +29,7 @@ import { SpinalEventService } from "spinal-env-viewer-task-service";
 import { FileSystem } from 'spinal-core-connectorjs_type';
 import { ServiceUser } from 'spinal-service-user'
 import * as moment from 'moment'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 
@@ -110,7 +111,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   */
   app.post("/api/v1/ticket/:id/create_event", async (req, res, next) => {
     try {
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(node)
 

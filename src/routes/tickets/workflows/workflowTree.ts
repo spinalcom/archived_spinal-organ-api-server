@@ -27,6 +27,7 @@ import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { WorkflowTree } from '../interfacesWorkflowAndTickets'
 import { recTree } from '../../../utilities/recTree'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
   /**
@@ -63,7 +64,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     var workflows: WorkflowTree;
 
     try {
-      var workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      var workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       if (workflow instanceof SpinalContext) {
         workflows = {
           dynamicId: workflow._server_id,

@@ -31,9 +31,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.spinalAPIMiddlewareInstance = void 0;
 const spinal_core_connectorjs_type_1 = require("spinal-core-connectorjs_type");
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const spinal_model_graph_1 = require("spinal-model-graph");
 const graphUtils_1 = require("./graphUtils");
 // get the config
 const { SpinalServiceUser } = require('spinal-service-user');
@@ -41,6 +50,7 @@ const config = require("../config");
 const lib_1 = require("./lib");
 class SpinalAPIMiddleware {
     constructor() {
+        this.profilesToGraph = new Map();
         this.loadedPtr = new Map();
     }
     // singleton class 
@@ -50,75 +60,37 @@ class SpinalAPIMiddleware {
         }
         return SpinalAPIMiddleware.instance;
     }
+    initGraph() {
+        const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
+        this.conn = spinal_core_connectorjs_type_1.spinalCore.connect(connect_opt);
+        spinal_core_connectorjs_type_1.spinalCore.load(this.conn, config.file.path, this.onLoadSuccess, this.onLoadError);
+    }
     setConnection(connect) {
         this.conn = connect;
     }
-    initGraph(graph) {
-        if (!graph)
-            this.connectAndLoadGraph();
-        else {
-            try {
-                this.onLoadSuccess(graph);
-            }
-            catch (error) {
-                this.onLoadError();
-            }
-        }
-    }
-    connectAndLoadGraph() {
-        const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
-        // FileSystem._disp = true
-        // initialize the connection
-        this.conn = spinal_core_connectorjs_type_1.spinalCore.connect(connect_opt);
-        // get the Model from the spinalhub, "onLoadSuccess" and "onLoadError" are 2
-        // callback function.
-        spinal_core_connectorjs_type_1.spinalCore.load(this.conn, config.file.path, this.onLoadSuccess, this.onLoadError);
-    }
-    onLoadError() {
-        console.error(`File does not exist in location ${config.file.path}`);
-    }
-    // called if connected to the server and if the spinalhub sent us the Model
-    onLoadSuccess(forgeFile) {
-        spinal_env_viewer_graph_service_1.SpinalGraphService.setGraph(forgeFile)
-            .then((id) => {
-            if (typeof id !== 'undefined') {
-                SpinalServiceUser.init();
-                graphUtils_1.spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
-            }
-        })
-            .catch(e => console.error(e));
-    }
-    getGraph() {
+    getGraph(profileId) {
+        if (profileId)
+            return this.profilesToGraph.get(profileId);
         return spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
     }
-    load(server_id) {
+    load(server_id, profileId) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!server_id) {
                 return Promise.reject({ code: 406, message: "Invalid serverId" });
             }
+            profileId = profileId || this.principaleGraphId;
             let node = spinal_core_connectorjs_type_1.FileSystem._objects[server_id];
             if (typeof node !== "undefined") {
-                const found = yield this._nodeIsBelongUserContext(node);
-                // @ts-ignore
-                if (found)
+                const found = yield this._nodeIsBelongUserContext(node, profileId);
+                if (found) {
+                    // @ts-ignore
+                    spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
+                    // @ts-ignore
                     return Promise.resolve(node);
+                }
                 return Promise.reject({ code: 401, message: "Unauthorized" });
             }
-            return new Promise((resolve, reject) => {
-                this.conn.load_ptr(server_id, (model) => __awaiter(this, void 0, void 0, function* () {
-                    if (!model) {
-                        // on error
-                        reject({ code: 404, message: "Node is not found" });
-                    }
-                    else {
-                        const contextFound = yield this._nodeIsBelongUserContext(model);
-                        // @ts-ignore
-                        if (contextFound)
-                            return resolve(node);
-                        return reject({ code: 401, message: "Unauthorized" });
-                    }
-                }));
-            });
+            return this.loadwithConnect(server_id, profileId);
         });
     }
     loadPtr(ptr) {
@@ -146,21 +118,143 @@ class SpinalAPIMiddleware {
         this.loadedPtr.set(server_id, prom);
         return prom;
     }
-    _nodeIsBelongUserContext(node) {
+    loadwithConnect(server_id, profileId) {
+        return new Promise((resolve, reject) => {
+            this.conn.load_ptr(server_id, (model) => __awaiter(this, void 0, void 0, function* () {
+                if (!model) {
+                    // on error
+                    reject({ code: 404, message: "Node is not found" });
+                }
+                else {
+                    const contextFound = yield this._nodeIsBelongUserContext(model, profileId);
+                    if (contextFound) {
+                        // @ts-ignore
+                        spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(model);
+                        // @ts-ignore
+                        return resolve(model);
+                    }
+                    return reject({ code: 401, message: "Unauthorized" });
+                }
+            }));
+        });
+    }
+    getNodeWithStaticId(nodeId, contextId, profileId) {
+        var e_1, _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            let context;
+            if (!isNaN(contextId))
+                context = this.load(contextId, profileId);
+            else {
+                const graph = this.getGraph(profileId);
+                context = yield this._getContext(graph, contextId);
+                if (!context)
+                    throw new Error(`no context found for ${contextId}`);
+                let exist = yield this._nodeIsBelongUserContext(context, profileId);
+                if (!exist)
+                    throw new Error(`Unauthorized`);
+            }
+            if (nodeId === contextId)
+                return context;
+            if (context instanceof spinal_model_graph_1.SpinalContext) {
+                try {
+                    for (var _b = __asyncValues(context.visitChildrenInContext(context)), _c; _c = yield _b.next(), !_c.done;) {
+                        const node = _c.value;
+                        if (node.getId().get() === nodeId) {
+                            // @ts-ignore
+                            spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
+                            return node;
+                        }
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+            }
+        });
+    }
+    addProfileToMap(profileId, graph) {
+        //@ts-ignore
+        spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(graph);
+        this.profilesToGraph.set(profileId, graph);
+    }
+    setPrincipaleGraph(graph) {
+        this.principaleGraphId = graph.getId().get();
+        this.addProfileToMap(this.principaleGraphId, graph);
+    }
+    //////////////////////////////////////////////////////////////
+    //                        PRIVATE                           //
+    //////////////////////////////////////////////////////////////
+    _nodeIsBelongUserContext(node, profileId) {
         return __awaiter(this, void 0, void 0, function* () {
             const type = node.getType().get();
             if (lib_1.EXCLUDES_TYPES.indexOf(type) !== -1)
                 return true;
-            const contexts = yield this._getUserContexts();
-            const found = contexts.find(context => node.belongsToContext(context));
+            const contexts = yield this._getProfileContexts(profileId);
+            const found = contexts.find(context => {
+                if (node instanceof spinal_model_graph_1.SpinalContext)
+                    return node.getId().get() === context.getId().get();
+                return node.belongsToContext(context);
+            });
             return found ? true : false;
         });
     }
-    _getUserContexts() {
-        const graph = this.getGraph();
-        return graph.getChildren();
+    _getProfileContexts(profileId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            profileId = profileId || this.principaleGraphId;
+            const graph = this.getGraph(profileId);
+            if (!graph)
+                throw new Error("no graph found");
+            const contexts = yield graph.getChildren(["hasContext"]);
+            //addContext to SpinalNode map
+            return contexts.map(context => {
+                //@ts-ignore
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
+                return context;
+            });
+        });
+    }
+    _getContext(graph, contextId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const context = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(contextId);
+            if (context)
+                return context;
+            const contexts = yield graph.getChildren(["hasContext"]);
+            return contexts.find(context => {
+                //@ts-ignore
+                spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
+                return context.getId().get() == contextId;
+            });
+            // for await (const context of graph.visitChildren([])) {
+            //   if (context.getId().get() == contextId) {
+            //     //@ts-ignore
+            //     SpinalGraphService._addNode(context);
+            //     return context;
+            //   }
+            // }
+        });
+    }
+    onLoadError() {
+        console.error(`File does not exist in location ${config.file.path}`);
+    }
+    onLoadSuccess(forgeFile) {
+        if (config.runLocalServer == "true" || config.runLocalServer === true) {
+            spinal_env_viewer_graph_service_1.SpinalGraphService.setGraph(forgeFile)
+                .then((id) => {
+                if (typeof id !== 'undefined') {
+                    SpinalServiceUser.init();
+                    graphUtils_1.spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
+                    SpinalAPIMiddleware.instance.setPrincipaleGraph(forgeFile);
+                }
+            })
+                .catch(e => console.error(e));
+        }
     }
 }
 SpinalAPIMiddleware.instance = null;
 exports.default = SpinalAPIMiddleware;
+exports.spinalAPIMiddlewareInstance = SpinalAPIMiddleware.getInstance();
 //# sourceMappingURL=spinalAPIMiddleware.js.map

@@ -24,6 +24,7 @@
 
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
   * @swagger
@@ -54,8 +55,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.delete("/api/v1/workflow/:id/delete", async (req, res, next) => {
     try {
       console.log("test");
+      const profileId = getProfileId(req);
 
-      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       if (workflow.getType().get() === "SpinalSystemServiceTicket") {
         workflow.removeFromGraph();
       }

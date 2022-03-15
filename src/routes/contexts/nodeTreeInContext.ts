@@ -27,6 +27,7 @@ import * as express from 'express';
 import { SpinalContext, SpinalGraphService, SpinalNode } from 'spinal-env-viewer-graph-service';
 import { ContextTree } from './interfacesContexts'
 import { recTree } from '../../utilities/recTree'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -71,8 +72,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     let tree: ContextTree;
 
     try {
-      var context = await spinalAPIMiddleware.load(parseInt(req.params.idContext, 10));
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10));
+      const profileId = getProfileId(req);
+      var context = await spinalAPIMiddleware.load(parseInt(req.params.idContext, 10), profileId);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(context);
       // @ts-ignore
@@ -86,7 +88,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           type: node.getType().get(),
           children: await recTree(node, context)
         };
-        status = "ok";
+        // status = "ok";
       } else {
         res.status(400).send("node not found in context");
       }

@@ -29,6 +29,7 @@ import { SpinalNode } from 'spinal-model-graph';
 import { NODE_TO_CATEGORY_RELATION } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { findOneInContext } from '../../../utilities/findOneInContext';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -67,7 +68,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
 
     try {
-      var floor: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+
+      var floor: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       var rooms = await floor.getChildren("hasGeographicRoom")
       let sommes = 0
       let _bimObjects = [];

@@ -26,6 +26,7 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
  * @swagger
@@ -78,10 +79,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.put("/api/v1/nomenclatureGroup/:contextId/category/:categoryId/update", async (req, res, next) => {
 
     try {
-      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10));
+      const profileId = getProfileId(req);
+      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(context)
-      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10));
+      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(category)
 
@@ -92,14 +94,14 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
             name: req.body.newNameCategory,
             icon: req.body.newNameIcon
           }
-         var categoryUpdated = await groupManagerService.updateCategory(category.getId().get(), dataObject)
-         var info = {
-          dynamicId: categoryUpdated._server_id,
-          staticId: categoryUpdated.getId().get(),
-          name: categoryUpdated.getName().get(),
-          type: categoryUpdated.getType().get(),
-          icon: categoryUpdated.info.icon.get()
-        };
+          var categoryUpdated = await groupManagerService.updateCategory(category.getId().get(), dataObject)
+          var info = {
+            dynamicId: categoryUpdated._server_id,
+            staticId: categoryUpdated.getId().get(),
+            name: categoryUpdated.getName().get(),
+            type: categoryUpdated.getType().get(),
+            icon: categoryUpdated.info.icon.get()
+          };
         } else {
           res.status(400).send("node is not type of AttributeConfigurationGroupContext ");
         }

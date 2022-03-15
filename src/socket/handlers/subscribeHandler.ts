@@ -23,30 +23,50 @@
  */
 
 import { Server, Socket } from "socket.io";
-import { structureDataFunc, getNodesFunc, _getRoomNameFunc } from "../../utilities/SocketHandlerUtils";
+import { structureDataFunc, _getRoomNameFunc, getNodesAndRooms } from "../../utilities/SocketHandlerUtils";
+import { SUBSCRIBE_EVENT, SUBSCRIBED, OK_STATUS } from '../../lib';
+import { spinalAPIMiddlewareInstance } from "../../spinalAPIMiddleware";
 import { spinalGraphUtils } from "../../graphUtils";
-import { OK_STATUS, SUBSCRIBE_EVENT, SUBSCRIBED } from '../../lib';
+const { runLocalServer } = require("../../../config");
 
 
 export function subscribeHandler(io: Server, socket: Socket) {
 
     socket.on(SUBSCRIBE_EVENT, async (...args) => {
-        console.log("received subscribe request from", socket.id);
+        let profileId = socket.handshake.auth.token?.profileId
+
+        if (!profileId && (runLocalServer == "true" || runLocalServer === true)) profileId = spinalAPIMiddlewareInstance.principaleGraphId;
 
         const { ids, options } = structureDataFunc(args);
 
-        const nodes = await getNodesFunc(ids);
-        const result = ids.map(({ nodeId, contextId }) => _getRoomNameFunc(nodeId, contextId, nodes, options))
-        socket.emit(SUBSCRIBED, result.length == 1 ? result[0] : result);
+        const responseData = await getNodesAndRooms(ids, profileId, options);
+        const responseFormatted = responseData.map(({ error, ids, status, eventNames }) => ({ error, ids, status, eventNames }))
 
-        result.forEach(({ error, nodeId, status, eventNames }) => {
+        socket.emit(SUBSCRIBED, responseFormatted.length == 1 ? responseFormatted[0] : responseFormatted);
+
+        responseData.forEach(({ error, node, context, status, eventNames }) => {
             if (!error && status === OK_STATUS) {
-                const { node, contextNode } = nodes[nodeId];
                 eventNames.forEach(roomId => socket.join(roomId));
 
-                spinalGraphUtils.bindNode(node, contextNode, options)
+                spinalGraphUtils.bindNode(node, context, options)
             }
         });
+
+
+
+        // const nodes = await getNodesFunc(ids);
+
+        // const result = ids.map(({ nodeId, contextId }) => _getRoomNameFunc(nodeId, contextId, nodes, options))
+        // socket.emit(SUBSCRIBED, result.length == 1 ? result[0] : result);
+
+        // result.forEach(({ error, nodeId, status, eventNames }) => {
+        //     if (!error && status === OK_STATUS) {
+        //         const { node, contextNode } = nodes[nodeId];
+        //         eventNames.forEach(roomId => socket.join(roomId));
+
+        //         spinalGraphUtils.bindNode(node, contextNode, options)
+        //     }
+        // });
     })
 }
 

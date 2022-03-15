@@ -33,6 +33,7 @@ import { Step } from '../interfacesWorkflowAndTickets';
 import { serviceTicketPersonalized } from 'spinal-service-ticket';
 import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
 import { ServiceUser } from 'spinal-service-user';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -89,9 +90,9 @@ module.exports = function (
       // var workflow = await spinalAPIMiddleware.load(parseInt(req.body.workflowId, 10));
       // //@ts-ignore
       // SpinalGraphService._addNode(workflow)
-
+      const profileId = getProfileId(req);
       var ticket: SpinalNode<any> = await spinalAPIMiddleware.load(
-        parseInt(req.params.ticketId, 10)
+        parseInt(req.params.ticketId, 10), profileId
       );
       //@ts-ignore
       SpinalGraphService._addNode(ticket);

@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
   * @swagger
@@ -57,8 +58,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.get("/api/v1/context/:contextId/node/:nodeId/nodesOfType/:type", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         let nodes = [];
         try {
-            var contextNode = yield spinalAPIMiddleware.load(parseInt(req.params.contextId, 10));
-            var node = yield spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var contextNode = yield spinalAPIMiddleware.load(parseInt(req.params.contextId, 10), profileId);
+            var node = yield spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId);
             var SpinalContextNodeId = contextNode.getId().get();
             // @ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(contextNode);

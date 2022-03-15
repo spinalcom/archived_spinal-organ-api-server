@@ -22,13 +22,14 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 import { spinalEventEmitter } from "spinal-env-viewer-plugin-event-emitter";
-import { ADD_CHILD_EVENT, ADD_CHILD_IN_CONTEXT_EVENT, REMOVE_CHILD_EVENT, REMOVE_CHILDREN_EVENT } from 'spinal-model-graph';
+import { ADD_CHILD_EVENT, ADD_CHILD_IN_CONTEXT_EVENT, REMOVE_CHILD_EVENT, REMOVE_CHILDREN_EVENT, SpinalGraph } from 'spinal-model-graph';
 import { SpinalGraphService, SpinalNode, SpinalContext } from 'spinal-env-viewer-graph-service';
 import { FileSystem, Model } from 'spinal-core-connectorjs_type';
 import { SpinalTimeSeries } from "spinal-model-timeseries";
 import * as lodash from "lodash";
 import { Server } from "socket.io";
 import { OK_STATUS, EVENT_NAMES, IAction, IScope, ISubscribeOptions } from './lib'
+import { spinalAPIMiddlewareInstance } from "./spinalAPIMiddleware";
 
 
 
@@ -43,6 +44,7 @@ class SpinalGraphUtils {
     public spinalConnection;
     private nodeBinded: Map<string, { bindTypes: { [key: string]: string }, events: { [key: string]: string } }> = new Map();
     private io: Server;
+
     constructor() {
         this._listenAddChildEvent();
         this._listenAddChildInContextEvent();
@@ -50,57 +52,56 @@ class SpinalGraphUtils {
         this._listenAddChildrenEvent();
     }
 
+
     public async init(conn: any): Promise<any> {
-        // await SpinalGraphService.setGraph(graph);
         this.spinalConnection = conn;
+
     }
 
     public setIo(io: Server) {
         this.io = io;
     }
 
-    public async getNode(nodeId: string | number, contextId?: string | number): Promise<SpinalNode<any>> {
+    public getProfileGraph(profileId: string): SpinalGraph<any> {
+        return spinalAPIMiddlewareInstance.getGraph(profileId);
+    }
+
+    // public async getNode(nodeId: string | number, contextId?: string | number): Promise<SpinalNode<any>> {
+    //     //@ts-ignore
+    //     if (!isNaN(nodeId)) {
+    //         const node = await this.getNodeWithServerId(<number>nodeId);
+    //         //@ts-ignore
+    //         if (node && node instanceof SpinalNode) SpinalGraphService._addNode(node);
+
+    //         return node;
+    //     }
+
+    //     return this.getNodeWithStaticId(nodeId.toString(), contextId);
+    // }
+
+    public async getNode(nodeId: string, contextId?: string, profileId?: string): Promise<SpinalNode<any>> {
         //@ts-ignore
         if (!isNaN(nodeId)) {
-            const node = await this.getNodeWithServerId(<number>nodeId);
-            //@ts-ignore
-            if (node && node instanceof SpinalNode) SpinalGraphService._addNode(node);
-
-            return node;
+            const server_id = parseInt(nodeId);
+            return spinalAPIMiddlewareInstance.load(server_id, profileId);
         }
 
-        return this.getNodeWithStaticId(nodeId.toString(), contextId);
+        return this.getNodeWithStaticId(nodeId.toString(), contextId, profileId);
     }
 
-    public getNodeWithServerId(server_id: number): Promise<any> {
-        return new Promise((resolve) => {
-            if (typeof FileSystem._objects[server_id] !== "undefined") {
-                return resolve(FileSystem._objects[server_id]);
-            }
-            this.spinalConnection.load_ptr(server_id, (node) => {
-                resolve(node);
-            })
-        });
-    }
+    // public getNodeWithServerId(server_id: number): Promise<any> {
+    //     return new Promise((resolve) => {
+    //         if (typeof FileSystem._objects[server_id] !== "undefined") {
+    //             return resolve(FileSystem._objects[server_id]);
+    //         }
+    //         this.spinalConnection.load_ptr(server_id, (node) => {
+    //             resolve(node);
+    //         })
+    //     });
+    // }
 
-    public async getNodeWithStaticId(nodeId: string, contextId?: string | number): Promise<SpinalNode<any>> {
-        if (!contextId) {
-            const ref = await SpinalGraphService.getNodeAsync(nodeId.toString());
-            if (ref) {
-                return SpinalGraphService.getRealNode(ref.id.get());
-            }
-        }
-
-        const context = await this.getNode(contextId);
-        if (context instanceof SpinalContext) {
-            for await (const node of context.visitChildrenInContext(context)) {
-                if (node.getId().get() === nodeId) {
-                    // @ts-ignore
-                    SpinalGraphService._addNode(node);
-                    return node;
-                }
-            }
-        }
+    public async getNodeWithStaticId(nodeId: string, contextId?: string, profileId?: string): Promise<SpinalNode<any>> {
+        return spinalAPIMiddlewareInstance.getNodeWithStaticId(nodeId, contextId, profileId)
     }
 
     public async bindNode(node: SpinalNode<any>, context: SpinalContext<any>, options: ISubscribeOptions, eventName?: string): Promise<void> {
@@ -153,6 +154,19 @@ class SpinalGraphUtils {
         const children = await node.getChildren(relations.filter(el => relationToExclude.indexOf(el) !== -1));
 
         children.forEach((child) => this.bindNode(child, null, {}, eventName));
+    }
+
+    public profileHasAccess(profileId: string, context: SpinalContext<any>, node?: SpinalNode<any>): boolean | Error {
+        const graph = this.getProfileGraph(profileId);
+        if (!graph) return new Error(`no graph found for ${profileId}`);
+
+        const contextIds = graph.getChildrenIds();
+        const contextFound = contextIds.find(id => id === context.getId().get());
+        if (!contextFound) return new Error(`Unauthorized: You have not access to ${context.getName().get()}`);
+
+        if (node && !node.belongsToContext(context)) return new Error(`Unauthorized: You have not access to ${node.getName().get()}`)
+
+        return true;
     }
 
 

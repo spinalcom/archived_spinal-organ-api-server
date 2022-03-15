@@ -27,6 +27,7 @@ import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-ser
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -69,7 +70,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.post("/api/v1/node/:id/category/create", async (req, res, next) => {
 
     try {
-      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10))
+      const profileId = getProfileId(req);
+      var node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId)
       var categoryName = req.body.categoryName
       serviceDocumentation.addCategoryAttribute(node, categoryName);
     } catch (error) {

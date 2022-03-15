@@ -28,6 +28,7 @@ import * as express from 'express';
 import { SpinalEventService } from "spinal-env-viewer-task-service";
 import { Event } from '../../calendar/interfacesContextsEvents'
 import { sendDate, verifDate } from "../../../utilities/dateFunctions"
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -77,8 +78,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 */
   app.post("/api/v1/room/:id/event_list", async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
       var nodes = [];
-      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      var room: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(room)
       if (room.getType().get() === "geographicRoom") {

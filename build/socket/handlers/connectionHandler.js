@@ -28,7 +28,7 @@ const subscribeHandler_1 = require("./subscribeHandler");
 const disconnectionHandler_1 = require("./disconnectionHandler");
 function connectionHandler(io) {
     io.on("connection", (socket) => {
-        const { handshake: { address, auth } } = socket;
+        // const { handshake: { address, auth } } = socket;
         (0, subscribeHandler_1.subscribeHandler)(io, socket);
         (0, disconnectionHandler_1.disconnecthandler)(socket);
     });

@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const recTree_1 = require("../../utilities/recTree");
+const requestUtilities_1 = require("../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -74,8 +75,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.get("/api/v1/context/:idContext/node/:idNode/tree", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         let tree;
         try {
-            var context = yield spinalAPIMiddleware.load(parseInt(req.params.idContext, 10));
-            var node = yield spinalAPIMiddleware.load(parseInt(req.params.idNode, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var context = yield spinalAPIMiddleware.load(parseInt(req.params.idContext, 10), profileId);
+            var node = yield spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId);
             // @ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(context);
             // @ts-ignore
@@ -88,7 +90,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     type: node.getType().get(),
                     children: yield (0, recTree_1.recTree)(node, context)
                 };
-                status = "ok";
+                // status = "ok";
             }
             else {
                 res.status(400).send("node not found in context");

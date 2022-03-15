@@ -24,6 +24,7 @@
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
   * @swagger
@@ -60,8 +61,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.delete("/api/v1/workflow/:workflowId/process/:processId/delete_process", async (req, res, next) => {
     try {
-      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10));
-      var process: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.processId, 10));
+      const profileId = getProfileId(req);
+      let workflow = await spinalAPIMiddleware.load(parseInt(req.params.workflowId, 10), profileId);
+      var process: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.processId, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(process);
 

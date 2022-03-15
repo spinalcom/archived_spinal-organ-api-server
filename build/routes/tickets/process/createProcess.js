@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 const spinal_service_ticket_1 = require("spinal-service-ticket");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -72,7 +73,8 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     */
     app.post("/api/v1/workflow/:id/create_process", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            var workflow = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            var workflow = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             // @ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(workflow);
             var allProcess = yield spinal_service_ticket_1.serviceTicketPersonalized.getAllProcess(workflow.getId().get());

@@ -27,6 +27,7 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalEventService } from "spinal-env-viewer-task-service";
 import { ContextEvent } from '../interfacesContextsEvents'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -76,10 +77,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 
   app.post("/api/v1/eventContext/:ContextId/eventCategory/:CategoryId/create_group", async (req, res, next) => {
     try {
-      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.ContextId, 10));
+      const profileId = getProfileId(req);
+      var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.ContextId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(context)
-      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.CategoryId, 10));
+      var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.CategoryId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(category)
       if (context instanceof SpinalContext && category.belongsToContext(context)) {

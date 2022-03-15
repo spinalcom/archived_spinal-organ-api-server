@@ -27,6 +27,7 @@ import * as express from 'express';
 import { IoTNetwork } from "../interfacesEndpointAndTimeSeries";
 import { SpinalGraph } from 'spinal-model-graph';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -67,8 +68,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
 
     let nodes = [];
     try {
-
-      let network = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+      const profileId = getProfileId(req);
+      let network = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
       // @ts-ignore
       SpinalGraphService._addNode(network);
       var devices = await network.getChildren("hasBmsDevice");
