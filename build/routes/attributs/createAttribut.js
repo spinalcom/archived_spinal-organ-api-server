@@ -99,12 +99,14 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             let childrens = yield node.getChildren(constants_1.NODE_TO_CATEGORY_RELATION);
             for (let index = 0; index < childrens.length; index++) {
                 if (childrens[index]._server_id === category._server_id) {
-                    spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addAttributeByCategoryName(node, category.getName().get(), attributeLabel, attributeValue, attributeType, attributeUnit);
+                    const attribute = yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addAttributeByCategoryName(node, category.getName().get(), attributeLabel, attributeValue, attributeType, attributeUnit);
+                    return res.status(200).send(attribute.get());
                 }
-                else {
-                    return res.status(400).send("ko");
-                }
+                // else {
+                // return res.status(400).send("ko");
+                // }
             }
+            return res.status(400).send("Category not found");
         }
         catch (error) {
             console.log(error);
@@ -112,7 +114,6 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 return res.status(error.code).send(error.message);
             return res.status(400).send("ko");
         }
-        res.json();
     }));
 };
 //# sourceMappingURL=createAttribut.js.map

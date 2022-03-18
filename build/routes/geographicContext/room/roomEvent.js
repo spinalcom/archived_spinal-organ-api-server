@@ -130,6 +130,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 res.status(400).send("node is not of type geographic room");
             }
             function ListEvents(array) {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
                 for (const child of array) {
                     // @ts-ignore
                     const _child = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(child.id.get());
@@ -137,19 +138,19 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         console.log(_child);
                         let info = {
                             dynamicId: _child._server_id,
-                            staticId: _child.getId().get(),
-                            name: _child.getName().get(),
-                            type: _child.getType().get(),
-                            groupeID: _child.info.groupId.get(),
-                            categoryID: child.categoryId.get(),
-                            nodeId: _child.info.nodeId.get(),
-                            startDate: _child.info.startDate.get(),
-                            endDate: _child.info.endDate.get(),
+                            staticId: (_a = _child.getId()) === null || _a === void 0 ? void 0 : _a.get(),
+                            name: (_b = _child.getName()) === null || _b === void 0 ? void 0 : _b.get(),
+                            type: (_c = _child.getType()) === null || _c === void 0 ? void 0 : _c.get(),
+                            groupeID: (_d = _child.info.groupId) === null || _d === void 0 ? void 0 : _d.get(),
+                            categoryID: (_e = child.categoryId) === null || _e === void 0 ? void 0 : _e.get(),
+                            nodeId: (_f = _child.info.nodeId) === null || _f === void 0 ? void 0 : _f.get(),
+                            startDate: (_g = _child.info.startDate) === null || _g === void 0 ? void 0 : _g.get(),
+                            endDate: (_h = _child.info.endDate) === null || _h === void 0 ? void 0 : _h.get(),
                             creationDate: _child.info.creationDate == undefined ? undefined : _child.info.creationDate,
                             user: {
-                                username: _child.info.user.username.get(),
-                                email: _child.info.user.email == undefined ? undefined : _child.info.user.email.get(),
-                                gsm: _child.info.user.gsm == undefined ? undefined : _child.info.user.gsm.get()
+                                username: (_j = _child.info.user.username) === null || _j === void 0 ? void 0 : _j.get(),
+                                email: _child.info.user.email == undefined ? undefined : (_k = _child.info.user.email) === null || _k === void 0 ? void 0 : _k.get(),
+                                gsm: _child.info.user.gsm == undefined ? undefined : (_l = _child.info.user.gsm) === null || _l === void 0 ? void 0 : _l.get()
                             }
                         };
                         nodes.push(info);

@@ -32,7 +32,7 @@ import * as express from 'express';
 import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service';
 import { serviceTicketPersonalized } from 'spinal-service-ticket';
 import getFiles from '../../../utilities/getFiles';
-import { LOGS_EVENTS } from 'spinal-service-ticket/dist/Constants';
+import { LOGS_EVENTS, } from 'spinal-service-ticket/dist/Constants';
 import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
@@ -180,7 +180,7 @@ module.exports = function (
           );
         else
           elementSelected = SpinalGraphService.getRealNode(
-            _ticket.info.nodeId.get()
+            _ticket.info.nodeId?.get()
           );
       } catch (error) {
         console.error(error);
@@ -190,16 +190,16 @@ module.exports = function (
         staticId: _ticket.getId().get(),
         name: _ticket.getName().get(),
         type: _ticket.getType().get(),
-        priority: _ticket.info.priority.get(),
-        creationDate: _ticket.info.creationDate.get(),
+        priority: _ticket.info.priority?.get(),
+        creationDate: _ticket.info.creationDate?.get(),
         description:
           _ticket.info.description == undefined
             ? ''
-            : _ticket.info.description.get(),
+            : _ticket.info.description?.get(),
         declarer_id:
           _ticket.info.declarer_id == undefined
             ? ''
-            : _ticket.info.declarer_id.get(),
+            : _ticket.info.declarer_id?.get(),
         elementSelected:
           elementSelected == undefined
             ? 0
@@ -210,13 +210,13 @@ module.exports = function (
               type: elementSelected.getType().get(),
             },
         userName:
-          _ticket.info.user == undefined ? '' : _ticket.info.user.name.get(),
+          _ticket.info.user == undefined ? '' : _ticket.info.user.name?.get() || _ticket.info.username?.get() || "",
         gmaoId:
-          _ticket.info.gmaoId == undefined ? '' : _ticket.info.gmaoId.get(),
+          _ticket.info.gmaoId == undefined ? '' : _ticket.info.gmaoId?.get(),
         gmaoDateCreation:
           _ticket.info.gmaoDateCreation == undefined
             ? ''
-            : _ticket.info.gmaoDateCreation.get(),
+            : _ticket.info.gmaoDateCreation?.get(),
         process: {
           dynamicId: _process._server_id,
           staticId: _process.getId().get(),

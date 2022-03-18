@@ -31,7 +31,7 @@ import { getProfileId } from "../../utilities/requestUtilities";
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
 * @swagger
-* /api/v1/node/{idNode}/category/{idCategory}/attribut/{attributName}/update:
+* /api/v1/node/{idNode}/category/{idCategory}/attribute/{attributName}/update:
 *   put:
 *     security: 
 *       - OauthSecurity: 
@@ -92,8 +92,8 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     let node = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId)
     let childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION)
     let nodes = []
-    let category = childrens.find(el => (
-      el.getId().get() === req.params.idCategory))
+    let category = childrens.find(el => (el._server_id == req.params.idCategory));
+
     if (typeof category != "undefined") {
       let attributes = await category.getElement();
       for (let index = 0; index < attributes.length; index++) {

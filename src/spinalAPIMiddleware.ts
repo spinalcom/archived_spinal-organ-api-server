@@ -73,6 +73,8 @@ class SpinalAPIMiddleware {
       return Promise.reject({ code: 406, message: "Invalid serverId" });
     }
 
+
+
     profileId = profileId || this.principaleGraphId;
 
     let node = FileSystem._objects[server_id];
@@ -124,6 +126,7 @@ class SpinalAPIMiddleware {
           // on error
           reject({ code: 404, message: "Node is not found" });
         } else {
+
           const contextFound = await this._nodeIsBelongUserContext(<any>model, profileId);
           if (contextFound) {
             // @ts-ignore
@@ -187,6 +190,7 @@ class SpinalAPIMiddleware {
     if (EXCLUDES_TYPES.indexOf(type) !== -1) return true;
 
     const contexts = await this._getProfileContexts(profileId);
+
     const found = contexts.find(context => {
       if (node instanceof SpinalContext) return node.getId().get() === context.getId().get();
       return node.belongsToContext(context)

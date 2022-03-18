@@ -27,6 +27,7 @@ import * as express from 'express';
 import { Workflow } from '../interfacesWorkflowAndTickets'
 import { profile } from 'console';
 import { getProfileId } from '../../../utilities/requestUtilities';
+import { SERVICE_TYPE } from 'spinal-service-ticket'
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -60,7 +61,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       var childrens = await spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
 
       for (const child of childrens) {
-        if (child.getType().get() === "SpinalSystemServiceTicket") {
+        console.log(child);
+        console.log(child.getType().get(), SERVICE_TYPE);
+
+        if (child.getType().get() === SERVICE_TYPE) {
           let info: Workflow = {
             dynamicId: child._server_id,
             staticId: child.getId().get(),
@@ -71,10 +75,12 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
         }
       }
 
+      res.send(nodes);
+
+
     } catch (error) {
       console.error(error);
       res.status(400).send("list of worflows is not loaded");
     }
-    res.send(nodes);
   });
 };

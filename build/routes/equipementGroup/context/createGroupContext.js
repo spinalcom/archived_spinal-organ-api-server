@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_plugin_group_manager_service_1 = require("spinal-env-viewer-plugin-group-manager-service");
+const constants_1 = require("spinal-env-viewer-context-geographic-service/build/constants");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -63,7 +64,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.post("/api/v1/equipementsGroup/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            spinal_env_viewer_plugin_group_manager_service_1.default.createGroupContext(req.body.contextName, "BIMObject");
+            spinal_env_viewer_plugin_group_manager_service_1.default.createGroupContext(req.body.contextName, constants_1.EQUIPMENT_TYPE);
         }
         catch (error) {
             console.error(error);

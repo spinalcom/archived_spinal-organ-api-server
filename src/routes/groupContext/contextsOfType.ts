@@ -26,6 +26,7 @@ import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import { ContextTree } from './interfacesGroupContexts'
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -62,7 +63,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     let nodes = [];
     try {
 
-      var groupContexts = await groupManagerService.getGroupContexts(req.params.type);
+      const profileId = getProfileId(req);
+      const graph = spinalAPIMiddleware.getGraph(profileId);
+      var groupContexts = await groupManagerService.getGroupContexts(req.params.type, graph);
 
       for (let index = 0; index < groupContexts.length; index++) {
         const realNode = SpinalGraphService.getRealNode(groupContexts[index].id)

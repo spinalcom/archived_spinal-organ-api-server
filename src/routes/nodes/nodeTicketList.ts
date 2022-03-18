@@ -77,9 +77,8 @@ module.exports = function (
       //@ts-ignore
       SpinalGraphService._addNode(node);
 
-      var ticketList = await node.getChildren(
-        'SpinalSystemServiceTicketHasTicket'
-      );
+
+      var ticketList = await node.getChildren('SpinalSystemServiceTicketHasTicket');
       for (const ticket of ticketList) {
         //context && workflow
         const workflow = SpinalGraphService.getRealNode(

@@ -25,6 +25,7 @@
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
+import { getProfileId } from '../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
  * @swagger
@@ -52,7 +53,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     let types = [];
     try {
-      var groupContexts = await groupManagerService.getGroupContexts();
+      const profilId = getProfileId(req);
+      const graph = spinalAPIMiddleware.getGraph(profilId);
+      var groupContexts = await groupManagerService.getGroupContexts(undefined, graph);
+
       for (const groupContext of groupContexts) {
         types.push(groupContext.type);
       }

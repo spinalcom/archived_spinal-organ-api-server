@@ -255,7 +255,7 @@ export interface EndPointRoom {
  */
 
 export interface Note {
-  date: number,
+  date: number | string,
   type: string,
   message: string,
 }

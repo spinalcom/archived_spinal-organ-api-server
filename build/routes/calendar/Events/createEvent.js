@@ -113,7 +113,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(category);
             if (context instanceof spinal_env_viewer_graph_service_1.SpinalContext) {
-                if (context.getType().get() === "SpinalEventGroupContext") {
+                if (context.getType().get() === spinal_env_viewer_task_service_1.CONTEXT_TYPE) {
                     let eventInfo = {
                         contextId: context.getId().get(),
                         groupId: groupe.getId().get(),
@@ -130,6 +130,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     };
                     let user = { username: "string", userId: 0 };
                     yield spinal_env_viewer_task_service_1.SpinalEventService.createEvent(context.getId().get(), groupe.getId().get(), node.getId().get(), eventInfo, user);
+                    res.send("created");
                 }
                 else {
                     return res.status(400).send("this context is not a SpinalEventGroupContext");
@@ -145,7 +146,20 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 return res.status(error.code).send(error.message);
             res.status(400).send("ko");
         }
-        res.json();
     }));
 };
+// {
+//   "name": "new event",
+//   "contextId": 36833568,
+//   "categoryDynamicId": 27212448,
+//   "groupDynamicId": 26609392,
+//   "nodeDynamicId": 295528528,
+//   "startDate": "18/03/2022",
+//   "endDate": "19/03/2022",
+//   "description": "hello world",
+//   "repeat": false,
+//   "repeatEnd": 19/03/2022,
+//   "count": 0,
+//   "period": 0
+// }
 //# sourceMappingURL=createEvent.js.map

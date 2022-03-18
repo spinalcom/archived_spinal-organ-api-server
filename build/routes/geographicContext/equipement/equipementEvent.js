@@ -68,6 +68,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
    *         description: Bad request
   */
     app.get("/api/v1/equipement/:id/event_list", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         try {
             const profileId = (0, requestUtilities_1.getProfileId)(req);
             var nodes = [];
@@ -82,16 +83,16 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     if (_child.getType().get() === "SpinalEvent") {
                         let info = {
                             dynamicId: _child._server_id,
-                            staticId: _child.getId().get(),
-                            name: _child.getName().get(),
-                            type: _child.getType().get(),
-                            groupeID: _child.info.groupId.get(),
-                            categoryID: child.categoryId.get(),
-                            nodeId: _child.info.nodeId.get(),
-                            repeat: _child.info.repeat.get(),
-                            description: _child.info.description.get(),
-                            startDate: _child.info.startDate.get(),
-                            endDate: _child.info.endDate.get(),
+                            staticId: (_a = _child.getId()) === null || _a === void 0 ? void 0 : _a.get(),
+                            name: (_b = _child.getName()) === null || _b === void 0 ? void 0 : _b.get(),
+                            type: (_c = _child.getType()) === null || _c === void 0 ? void 0 : _c.get(),
+                            groupeID: (_d = _child.info.groupId) === null || _d === void 0 ? void 0 : _d.get(),
+                            categoryID: (_e = child.categoryId) === null || _e === void 0 ? void 0 : _e.get(),
+                            nodeId: (_f = _child.info.nodeId) === null || _f === void 0 ? void 0 : _f.get(),
+                            repeat: (_g = _child.info.repeat) === null || _g === void 0 ? void 0 : _g.get(),
+                            description: (_h = _child.info.description) === null || _h === void 0 ? void 0 : _h.get(),
+                            startDate: (_j = _child.info.startDate) === null || _j === void 0 ? void 0 : _j.get(),
+                            endDate: (_k = _child.info.endDate) === null || _k === void 0 ? void 0 : _k.get(),
                         };
                         nodes.push(info);
                     }

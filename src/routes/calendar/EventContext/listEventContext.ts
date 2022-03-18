@@ -24,8 +24,9 @@
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
-import { SpinalEventService } from "spinal-env-viewer-task-service";
+import { SpinalEventService, CONTEXT_TYPE } from "spinal-env-viewer-task-service";
 import { ContextEvent } from '../interfacesContextsEvents'
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
@@ -55,15 +56,19 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
   app.get("/api/v1/eventContext/list", async (req, res, next) => {
 
-    let nodes = [];
+
     try {
+      let nodes = [];
+      const profileId = getProfileId(req);
+      const userGraph = spinalAPIMiddleware.getGraph(profileId);
 
-      var listContextEvents = await SpinalEventService.getEventContexts()
+      const contexts = userGraph ? await userGraph.getChildren("hasContext") : []
+      var listContextEvents = contexts.filter(context => context.getType().get() === CONTEXT_TYPE);
 
-      for (const child of listContextEvents) {
+      for (const _child of listContextEvents) {
         // @ts-ignore
-        const _child = SpinalGraphService.getRealNode(child.id.get())
-        if (_child.getType().get() === "SpinalEventGroupContext") {
+        // const _child = SpinalGraphService.getRealNode(child.id.get())
+        if (_child.getType().get() === CONTEXT_TYPE) {
           let info: ContextEvent = {
             dynamicId: _child._server_id,
             staticId: _child.getId().get(),
@@ -74,11 +79,12 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
         }
       }
 
+      res.send(nodes);
     } catch (error) {
       console.error(error);
       if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send("list of contexts events is not loaded");
     }
-    res.send(nodes);
+
   });
 };

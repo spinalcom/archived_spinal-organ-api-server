@@ -25,6 +25,7 @@
 import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
+import { EQUIPMENT_TYPE } from "spinal-env-viewer-context-geographic-service/build/constants";
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
@@ -59,7 +60,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/equipementsGroup/create", async (req, res, next) => {
 
     try {
-      groupManagerService.createGroupContext(req.body.contextName, "BIMObject")
+      groupManagerService.createGroupContext(req.body.contextName, EQUIPMENT_TYPE)
     } catch (error) {
       console.error(error)
       if (error.code && error.message) return res.status(error.code).send(error.message);

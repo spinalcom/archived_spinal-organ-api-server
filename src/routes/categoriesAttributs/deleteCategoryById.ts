@@ -67,7 +67,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     try {
       const profileId = getProfileId(req);
-      let node = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId)
+      let node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.nodeId, 10), profileId)
       let category = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10), profileId)
       const result = await serviceDocumentation._categoryExist(node, category.getName().get());
       if (result === undefined) {

@@ -210,7 +210,7 @@ export interface EndPointRoom {
 *           type: "string"
  */
 export interface Note {
-    date: number;
+    date: number | string;
     type: string;
     message: string;
 }

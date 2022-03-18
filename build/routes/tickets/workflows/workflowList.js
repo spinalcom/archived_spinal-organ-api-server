@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const requestUtilities_1 = require("../../../utilities/requestUtilities");
+const spinal_service_ticket_1 = require("spinal-service-ticket");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -63,7 +64,9 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             const profileId = (0, requestUtilities_1.getProfileId)(req);
             var childrens = yield spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
             for (const child of childrens) {
-                if (child.getType().get() === "SpinalSystemServiceTicket") {
+                console.log(child);
+                console.log(child.getType().get(), spinal_service_ticket_1.SERVICE_TYPE);
+                if (child.getType().get() === spinal_service_ticket_1.SERVICE_TYPE) {
                     let info = {
                         dynamicId: child._server_id,
                         staticId: child.getId().get(),
@@ -73,12 +76,12 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                     nodes.push(info);
                 }
             }
+            res.send(nodes);
         }
         catch (error) {
             console.error(error);
             res.status(400).send("list of worflows is not loaded");
         }
-        res.send(nodes);
     }));
 };
 //# sourceMappingURL=workflowList.js.map

@@ -36,6 +36,7 @@ import { ServiceUser } from 'spinal-service-user';
 import { awaitSync } from '../../../utilities/awaitSync';
 import { _load } from '../../../utilities/loadNode';
 import { LocalFileData } from 'get-file-object-from-local-path';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (
   logger,
@@ -107,6 +108,7 @@ module.exports = function (
    */
   app.post('/api/v1/ticket/create_ticket', async (req, res, next) => {
     try {
+      const profileId = getProfileId(req);
       let ticketCreated;
       let ticketInfo = {
         name: req.body.name,
@@ -120,9 +122,7 @@ module.exports = function (
         parseInt(req.body.workflow, 10),
         parseInt(req.body.process, 10),
       ];
-      const [node, workflowById, processById]: SpinalNode<any>[] = await _load(
-        arrayofServerId
-      );
+      const [node, workflowById, processById]: SpinalNode<any>[] = await _load(arrayofServerId, profileId);
       //@ts-ignore
       SpinalGraphService._addNode(node);
       if (workflowById === undefined && processById === undefined) {

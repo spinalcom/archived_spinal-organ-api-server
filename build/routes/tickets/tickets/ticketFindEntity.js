@@ -77,6 +77,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 name: elementSelected.getName().get(),
                 type: elementSelected.getType().get(),
             };
+            res.json(info);
         }
         catch (error) {
             console.log(error);
@@ -84,7 +85,6 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 return res.status(error.code).send(error.message);
             res.status(400).send("ko");
         }
-        res.json(info);
     }));
 };
 //# sourceMappingURL=ticketFindEntity.js.map

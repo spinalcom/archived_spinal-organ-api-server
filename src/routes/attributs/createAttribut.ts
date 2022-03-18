@@ -96,17 +96,20 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       let childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION)
       for (let index = 0; index < childrens.length; index++) {
         if (childrens[index]._server_id === category._server_id) {
-          serviceDocumentation.addAttributeByCategoryName(node, category.getName().get(), attributeLabel, attributeValue, attributeType, attributeUnit)
-        } else {
-          return res.status(400).send("ko");
+          const attribute = await serviceDocumentation.addAttributeByCategoryName(node, category.getName().get(), attributeLabel, attributeValue, attributeType, attributeUnit)
+          return res.status(200).send(attribute.get());
         }
+        // else {
+        // return res.status(400).send("ko");
+        // }
       }
+
+      return res.status(400).send("Category not found")
 
     } catch (error) {
       console.log(error);
       if (error.code && error.message) return res.status(error.code).send(error.message);
       return res.status(400).send("ko");
     }
-    res.json();
   })
 }

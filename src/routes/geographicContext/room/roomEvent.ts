@@ -134,19 +134,19 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
             let info = {
               dynamicId: _child._server_id,
-              staticId: _child.getId().get(),
-              name: _child.getName().get(),
-              type: _child.getType().get(),
-              groupeID: _child.info.groupId.get(),
-              categoryID: child.categoryId.get(),
-              nodeId: _child.info.nodeId.get(),
-              startDate: _child.info.startDate.get(),
-              endDate: _child.info.endDate.get(),
+              staticId: _child.getId()?.get(),
+              name: _child.getName()?.get(),
+              type: _child.getType()?.get(),
+              groupeID: _child.info.groupId?.get(),
+              categoryID: child.categoryId?.get(),
+              nodeId: _child.info.nodeId?.get(),
+              startDate: _child.info.startDate?.get(),
+              endDate: _child.info.endDate?.get(),
               creationDate: _child.info.creationDate == undefined ? undefined : _child.info.creationDate,
               user: {
-                username: _child.info.user.username.get(),
-                email: _child.info.user.email == undefined ? undefined : _child.info.user.email.get(),
-                gsm: _child.info.user.gsm == undefined ? undefined : _child.info.user.gsm.get()
+                username: _child.info.user.username?.get(),
+                email: _child.info.user.email == undefined ? undefined : _child.info.user.email?.get(),
+                gsm: _child.info.user.gsm == undefined ? undefined : _child.info.user.gsm?.get()
               }
 
             };

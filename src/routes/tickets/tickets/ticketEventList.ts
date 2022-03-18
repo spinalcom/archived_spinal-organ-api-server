@@ -85,10 +85,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       SpinalGraphService._addNode(node)
 
 
-      if (node.getType().get() === "SpinalSystemServiceTicketTypeTicket") {
+      if (node.getType()?.get() === "SpinalSystemServiceTicketTypeTicket") {
 
         if (req.body.period === "all") {
-          let listEvents = await SpinalEventService.getEvents(node.getId().get())
+          let listEvents = await SpinalEventService.getEvents(node.getId()?.get())
           ListEvents(listEvents);
 
         } else if (req.body.period === "today") {
@@ -98,7 +98,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           var end = new Date();
           end.setHours(25, 59, 59, 999);
 
-          let listEvents = await SpinalEventService.getEvents(node.getId().get(), start, end);
+          let listEvents = await SpinalEventService.getEvents(node.getId()?.get(), start, end);
           ListEvents(listEvents);
         }
 
@@ -110,7 +110,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           firstday.setHours(2, 0, 0, 0).toString();
           var lastday = new Date(curr.setDate(last));
           lastday.setHours(25, 59, 59, 999).toString();
-          let listEvents = await SpinalEventService.getEvents(node.getId().get(), firstday, lastday);
+          let listEvents = await SpinalEventService.getEvents(node.getId()?.get(), firstday, lastday);
           ListEvents(listEvents);
         }
 
@@ -120,7 +120,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           } else {
             const start = sendDate(req.body.startDate)
             const end = sendDate(req.body.endDate)
-            let listEvents = await SpinalEventService.getEvents(node.getId().get(), start.toDate(), end.toDate());
+            let listEvents = await SpinalEventService.getEvents(node.getId()?.get(), start.toDate(), end.toDate());
             ListEvents(listEvents);
           }
         }
@@ -132,23 +132,23 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       function ListEvents(array) {
         for (const child of array) {
           // @ts-ignore
-          const _child = SpinalGraphService.getRealNode(child.id.get())
-          if (_child.getType().get() === "SpinalEvent") {
+          const _child = SpinalGraphService.getRealNode(child.id?.get())
+          if (_child.getType()?.get() === "SpinalEvent") {
             let info = {
               dynamicId: _child._server_id,
-              staticId: _child.getId().get(),
-              name: _child.getName().get(),
-              type: _child.getType().get(),
-              groupeID: _child.info.groupId.get(),
-              categoryID: child.categoryId.get(),
-              nodeId: _child.info.nodeId.get(),
-              startDate: _child.info.startDate.get(),
-              endDate: _child.info.endDate.get(),
-              creationDate: _child.info.creationDate.get(),
+              staticId: _child.getId()?.get(),
+              name: _child.getName()?.get(),
+              type: _child.getType()?.get(),
+              groupeID: _child.info.groupId?.get(),
+              categoryID: child.categoryId?.get(),
+              nodeId: _child.info.nodeId?.get(),
+              startDate: _child.info.startDate?.get(),
+              endDate: _child.info.endDate?.get(),
+              creationDate: _child.info.creationDate?.get(),
               user: {
-                username: _child.info.user.username.get(),
-                email: _child.info.user.email == undefined ? undefined : _child.info.user.email.get(),
-                gsm: _child.info.user.gsm == undefined ? undefined : _child.info.user.gsm.get()
+                username: _child.info.user.username?.get(),
+                email: _child.info.user.email == undefined ? undefined : _child.info.user.email?.get(),
+                gsm: _child.info.user.gsm == undefined ? undefined : _child.info.user.gsm?.get()
               }
 
             };

@@ -28,6 +28,7 @@ import { Building } from '../interfacesGeoContext'
 import { SpinalNode } from 'spinal-model-graph';
 import { NODE_TO_CATEGORY_RELATION } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
+import { getProfileId } from '../../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -57,8 +58,14 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     try {
       var address;
       var sommes = 0;
-      var geographicContexts = await SpinalGraphService.getContextWithType("geographicContext");
-      var building = await geographicContexts[0].getChildren("hasGeographicBuilding")
+      const profileId = getProfileId(req);
+      const graph = spinalAPIMiddleware.getGraph(profileId);
+
+      const contexts = await graph.getChildren("hasContext");
+
+      // var geographicContexts = await SpinalGraphService.getContextWithType("geographicContext");
+      var geographicContexts = contexts.filter(el => el.getType().get() === "geographicContext");
+      var building = await geographicContexts[0].getChildren("hasGeographicBuilding");
       var floors = await building[0].getChildren("hasGeographicFloor")
 
       for (let index = 0; index < floors.length; index++) {

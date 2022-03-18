@@ -68,6 +68,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
      *         description: Bad request
      */
     app.get('/api/v1/ticket/:ticketId/read_details', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         try {
             const profileId = (0, requestUtilities_1.getProfileId)(req);
             var _ticket = yield spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
@@ -166,7 +167,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 if (_ticket.info.elementSelected !== undefined)
                     elementSelected = yield spinalAPIMiddleware.loadPtr(_ticket.info.elementSelected);
                 else
-                    elementSelected = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(_ticket.info.nodeId.get());
+                    elementSelected = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode((_a = _ticket.info.nodeId) === null || _a === void 0 ? void 0 : _a.get());
             }
             catch (error) {
                 console.error(error);
@@ -176,14 +177,14 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 staticId: _ticket.getId().get(),
                 name: _ticket.getName().get(),
                 type: _ticket.getType().get(),
-                priority: _ticket.info.priority.get(),
-                creationDate: _ticket.info.creationDate.get(),
+                priority: (_b = _ticket.info.priority) === null || _b === void 0 ? void 0 : _b.get(),
+                creationDate: (_c = _ticket.info.creationDate) === null || _c === void 0 ? void 0 : _c.get(),
                 description: _ticket.info.description == undefined
                     ? ''
-                    : _ticket.info.description.get(),
+                    : (_d = _ticket.info.description) === null || _d === void 0 ? void 0 : _d.get(),
                 declarer_id: _ticket.info.declarer_id == undefined
                     ? ''
-                    : _ticket.info.declarer_id.get(),
+                    : (_e = _ticket.info.declarer_id) === null || _e === void 0 ? void 0 : _e.get(),
                 elementSelected: elementSelected == undefined
                     ? 0
                     : {
@@ -192,11 +193,11 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         name: elementSelected.getName().get(),
                         type: elementSelected.getType().get(),
                     },
-                userName: _ticket.info.user == undefined ? '' : _ticket.info.user.name.get(),
-                gmaoId: _ticket.info.gmaoId == undefined ? '' : _ticket.info.gmaoId.get(),
+                userName: _ticket.info.user == undefined ? '' : ((_f = _ticket.info.user.name) === null || _f === void 0 ? void 0 : _f.get()) || ((_g = _ticket.info.username) === null || _g === void 0 ? void 0 : _g.get()) || "",
+                gmaoId: _ticket.info.gmaoId == undefined ? '' : (_h = _ticket.info.gmaoId) === null || _h === void 0 ? void 0 : _h.get(),
                 gmaoDateCreation: _ticket.info.gmaoDateCreation == undefined
                     ? ''
-                    : _ticket.info.gmaoDateCreation.get(),
+                    : (_j = _ticket.info.gmaoDateCreation) === null || _j === void 0 ? void 0 : _j.get(),
                 process: {
                     dynamicId: _process._server_id,
                     staticId: _process.getId().get(),

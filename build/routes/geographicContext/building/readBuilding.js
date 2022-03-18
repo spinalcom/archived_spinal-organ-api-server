@@ -33,7 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("spinal-env-viewer-plugin-documentation-service/dist/Models/constants");
-const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -60,7 +60,11 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
         try {
             var address;
             var sommes = 0;
-            var geographicContexts = yield spinal_env_viewer_graph_service_1.SpinalGraphService.getContextWithType("geographicContext");
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            const graph = spinalAPIMiddleware.getGraph(profileId);
+            const contexts = yield graph.getChildren("hasContext");
+            // var geographicContexts = await SpinalGraphService.getContextWithType("geographicContext");
+            var geographicContexts = contexts.filter(el => el.getType().get() === "geographicContext");
             var building = yield geographicContexts[0].getChildren("hasGeographicBuilding");
             var floors = yield building[0].getChildren("hasGeographicFloor");
             for (let index = 0; index < floors.length; index++) {

@@ -1,6 +1,6 @@
 {
   "name": "spinal-organ-api-server",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "spinal-organ-network_sample": "git+https://github.com/spinalcom/spinal-organ-network_sample.git",
     "spinal-service-ticket": "git+https://github.com/spinalcom/spinal-service-ticket.git",
     "spinal-service-user": "git+https://github.com/spinalcom/spinal-service-user.git",
+    "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
     "stringify": "^5.2.0",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",

@@ -22,11 +22,12 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service'
+import { ICategory, serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-service'
 import { NODE_TO_CATEGORY_RELATION } from "spinal-env-viewer-plugin-documentation-service/dist/Models/constants";
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
 
@@ -68,25 +69,31 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   *         description: Bad request
   */
 
-  //   app.delete("/api/v1/node/:idNode/category/:idCategory/attribute/:attributName/delete", async (req, res, next) => {
-  //     try {
-  //       let node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10));
-  //       let category = await spinalAPIMiddleware.load(parseInt(req.params.idCategory));
-  //       let attributeLabel = req.params.attributName
-  //       let childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION)
+  app.delete("/api/v1/node/:idNode/category/:idCategory/attribute/:attributName/delete", async (req, res, next) => {
+    try {
+      const profileId = getProfileId(req);
+      let node: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.idNode, 10), profileId);
+      let category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.idCategory), profileId);
+      let attributeLabel = req.params.attributName
+      let childrens = await node.getChildren(NODE_TO_CATEGORY_RELATION)
 
-  //       for (let index = 0; index < childrens.length; index++) {
-  //         if (childrens[index]._server_id === category._server_id) {
-  //           await serviceDocumentation.removeAttributesByLabel(category, attributeLabel);
-  //         } else {
-  //           return res.status(400).send("ko");
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //       return res.status(400).send("ko");
-  //     }
-  //     res.json();
-  //   })
+
+      for (let index = 0; index < childrens.length; index++) {
+        if (childrens[index]._server_id === category._server_id) {
+          await serviceDocumentation.removeAttributesByLabel(<any>category, attributeLabel);
+          return res.status(200).send("deleted")
+        }
+        // else {
+        // return res.status(400).send("ko");
+        // }
+      }
+      res.status(404).send("category not found");
+    } catch (error) {
+      console.log(error);
+      if (error.code && error.message) return res.status(error.code).send(error.message);
+      return res.status(400).send("ko");
+    }
+    res.json();
+  })
 
 }

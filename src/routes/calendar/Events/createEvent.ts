@@ -25,7 +25,7 @@
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
-import { SpinalEventService } from "spinal-env-viewer-task-service";
+import { CONTEXT_TYPE, SpinalEventService } from "spinal-env-viewer-task-service";
 import * as moment from 'moment'
 import { getProfileId } from '../../../utilities/requestUtilities';
 
@@ -110,7 +110,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       SpinalGraphService._addNode(category)
 
       if (context instanceof SpinalContext) {
-        if (context.getType().get() === "SpinalEventGroupContext") {
+        if (context.getType().get() === CONTEXT_TYPE) {
           let eventInfo = {
             contextId: context.getId().get(),
             groupId: groupe.getId().get(),
@@ -128,6 +128,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           let user = { username: "string", userId: 0 }
 
           await SpinalEventService.createEvent(context.getId().get(), groupe.getId().get(), node.getId().get(), eventInfo, user)
+          res.send("created");
 
         }
         else {
@@ -142,6 +143,21 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send("ko");
     }
-    res.json();
   })
 }
+
+
+// {
+//   "name": "new event",
+//   "contextId": 36833568,
+//   "categoryDynamicId": 27212448,
+//   "groupDynamicId": 26609392,
+//   "nodeDynamicId": 295528528,
+//   "startDate": "18/03/2022",
+//   "endDate": "19/03/2022",
+//   "description": "hello world",
+//   "repeat": false,
+//   "repeatEnd": 19/03/2022,
+//   "count": 0,
+//   "period": 0
+// }
