@@ -22,18 +22,22 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 import * as path from "path";
+import * as fs from 'fs';
 // import arrayOfRequests from "./absfiles"
-// import { arrayOfRequests } from "./finalList";
+// import { arrayOfRequests } from "../swagger_files/finalList";
 
 // List all files in a directory in Node.js recursively in a synchronous fashion
 
 
 export function getListRequest() {
-  const routeDir = path.join(__dirname, 'routes');
+  const routeDir = path.join(__dirname, "..", "src", 'routes');
   const absfiles = walkSync(routeDir);
 
+  createFinalistListFile(absfiles);
+  const paths = absfiles.map(el => path.resolve(__dirname, el));
 
-  return absfiles.map(el => path.resolve(__dirname, el));
+  return paths;
+
 
   // var doNotMatch = [];
   // var MatchList = [];
@@ -62,11 +66,17 @@ export function getListRequest() {
 }
 
 
+const createFinalistListFile = (absFiles) => {
+  fs.writeFile(path.resolve(__dirname, '../swagger_files/finalList.js'), `module.exports = ${JSON.stringify(absFiles, null, 2)}`, function (err) {
+    if (err) {
+      console.error(err);
+    }
+  })
+}
 
-var walkSync = function (dir: string, filelist?: string[]): string[] {
+const walkSync = function (dir: string, filelist?: string[]): string[] {
   var path = path || require('path');
-  var fs = fs || require('fs'),
-    files = fs.readdirSync(dir);
+  var fs = fs || require('fs'), files = fs.readdirSync(dir);
   filelist = filelist || [];
 
   files.forEach(function (file) {
@@ -77,25 +87,41 @@ var walkSync = function (dir: string, filelist?: string[]): string[] {
       filelist.push(path.relative(__dirname, path.join(dir, file)));
     }
   });
-  filelist.sort((a, b) => getIndexCat(a) - getIndexCat(b));
-  return filelist;
-};
 
-function getCat(filePath: string): string {
+  return filelist.sort((a, b) => getIndexCat(a) - getIndexCat(b));
+}
+
+const getCat = (filePath: string) => {
   const dir = filePath.split(path.sep);
   for (let idx = 0; idx < dir.length; idx++) {
     if (dir[idx] === 'routes') return dir[idx + 1];
   }
 }
 
-
-function getIndexCat(filePath: string): number {
+const getIndexCat = (filePath: string) => {
   const orderCat = [
-    "contexts", "nodes", "categoriesAttributs", "attributs", "geographicContext", "IoTNetwork", "tickets", "notes", "calendar", "groupContext", "roomGroup", "equipementGroup", "endpointGroup", "Nomenclature Group", "Analytics", "BIM"
+    "contexts",
+    "nodes",
+    "categoriesAttributs",
+    "attributs",
+    "geographicContext",
+    "IoTNetwork",
+    "tickets",
+    "notes",
+    "calendar",
+    "groupContext",
+    "roomGroup",
+    "equipementGroup",
+    "endpointGroup",
+    "NomenclatureGroup",
+    "Analytics",
+    "BIM",
+    "routes"
   ];
   const dir = getCat(filePath);
   if (!dir) return 9999;
-  return orderCat.indexOf(dir);
+
+  return orderCat.findIndex(element => element.toLocaleLowerCase() === dir.toLocaleLowerCase());
 }
 
 

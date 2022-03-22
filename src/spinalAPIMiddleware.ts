@@ -31,6 +31,7 @@ import { spinalGraphUtils } from "./graphUtils";
 const { SpinalServiceUser } = require('spinal-service-user');
 import * as config from '../config';
 import { EXCLUDES_TYPES } from './lib';
+import { File as SpinalFile } from "spinal-core-connectorjs_type";
 
 class SpinalAPIMiddleware {
   static instance: SpinalAPIMiddleware = null;
@@ -52,10 +53,15 @@ class SpinalAPIMiddleware {
     return SpinalAPIMiddleware.instance;
   }
 
-  public initGraph() {
-    const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
-    this.conn = spinalCore.connect(connect_opt);
-    spinalCore.load(this.conn, config.file.path, this.onLoadSuccess, this.onLoadError);
+  public initGraph(digitalTwinPath?: string, connect?: spinal.FileSystem) {
+    digitalTwinPath = digitalTwinPath || config.file.path;
+    if (connect) this.conn = connect;
+    if (!this.conn) {
+      const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
+      this.conn = spinalCore.connect(connect_opt);
+    }
+
+    spinalCore.load(this.conn, digitalTwinPath, this.onLoadSuccess, this.onLoadError);
   }
 
 
@@ -79,6 +85,7 @@ class SpinalAPIMiddleware {
 
     let node = FileSystem._objects[server_id];
     if (typeof node !== "undefined") {
+      if (node instanceof SpinalFile) return <any>node;
       const found = await this._nodeIsBelongUserContext(<SpinalNode<any>>node, profileId);
 
       if (found) {
@@ -126,6 +133,7 @@ class SpinalAPIMiddleware {
           // on error
           reject({ code: 404, message: "Node is not found" });
         } else {
+          if (model instanceof SpinalFile) return resolve(model);
 
           const contextFound = await this._nodeIsBelongUserContext(<any>model, profileId);
           if (contextFound) {
@@ -239,17 +247,17 @@ class SpinalAPIMiddleware {
   }
 
   private onLoadSuccess(forgeFile: SpinalGraph<any>): void {
-    if (config.runLocalServer == "true" || config.runLocalServer === true) {
-      SpinalGraphService.setGraph(forgeFile)
-        .then((id) => {
-          if (typeof id !== 'undefined') {
-            SpinalServiceUser.init();
-            spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
-            SpinalAPIMiddleware.instance.setPrincipaleGraph(forgeFile);
-          }
-        })
-        .catch(e => console.error(e));
-    }
+    // if (config.runLocalServer == "true" || config.runLocalServer === true) {
+    SpinalGraphService.setGraph(forgeFile)
+      .then((id) => {
+        if (typeof id !== 'undefined') {
+          SpinalServiceUser.init();
+          spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
+          SpinalAPIMiddleware.instance.setPrincipaleGraph(forgeFile);
+        }
+      })
+      .catch(e => console.error(e));
+    // }
 
   }
 

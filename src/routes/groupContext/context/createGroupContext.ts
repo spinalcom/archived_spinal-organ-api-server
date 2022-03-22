@@ -26,6 +26,7 @@ import SpinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import groupManagerService from "spinal-env-viewer-plugin-group-manager-service"
 import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer-graph-service'
+import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
  * @swagger
@@ -63,12 +64,24 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/groupContext/create", async (req, res, next) => {
 
     try {
-      groupManagerService.createGroupContext(req.body.contextName, req.body.childrenType)
+      const profileId = getProfileId(req);
+      const userGraph = spinalAPIMiddleware.getGraph(profileId);
+      if (!userGraph) res.status(406).send(`No graph found for ${profileId}`);
+
+      const context = await groupManagerService.createGroupContext(req.body.contextName, req.body.childrenType);
+
+      userGraph.addContext(context);
+
+      res.status(200).json({
+        name: context.getName().get(),
+        staticId: context.getId().get(),
+        dynamicId: context._server_id,
+        type: context.getType().get()
+      });
     } catch (error) {
       console.error(error)
       res.status(400).send("ko")
     }
-    res.json();
   })
 
 }

@@ -77,7 +77,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             var ticket = yield spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(ticket);
-            var user = { username: "admin", userId: 0 };
+            var user = { username: "admin", userId: 168 };
             // console.log("6582658", await serviceDocumentation.addNote(ticket, user, req.body.note));
             const note = yield spinal_env_viewer_plugin_documentation_service_1.serviceDocumentation.addNote(ticket, user, req.body.note);
             const elementNote = yield note.element.load();

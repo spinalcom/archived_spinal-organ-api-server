@@ -24,24 +24,21 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
-const fileUpload = require("express-fileupload");
-const cors = require("cors");
-const bodyParser = require("body-parser");
 function APIServer() {
     const app = express();
     // enable files upload
     // runSocketServer(app);
-    app.use(fileUpload({
-        createParentPath: true
-    }));
-    app.use(cors());
-    app.disable('x-powered-by');
-    app.use(bodyParser.urlencoded({
-        extended: true
-    }));
-    app.use(bodyParser.json());
-    // app.use(morgan('dev'));
-    app.use('/admin', express.static('public'));
+    // app.use(fileUpload({
+    //   createParentPath: true
+    // }));
+    // app.use(cors());
+    // app.disable('x-powered-by');
+    // app.use(bodyParser.urlencoded({
+    //   extended: true
+    // }));
+    // app.use(bodyParser.json());
+    // // app.use(morgan('dev'));
+    // app.use('/admin', express.static('public'));
     return app;
 }
 exports.default = APIServer;

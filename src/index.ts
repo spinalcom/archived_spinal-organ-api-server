@@ -26,6 +26,10 @@
 
 
 import * as express from 'express';
+import * as fileUpload from "express-fileupload";
+import * as cors from "cors";
+import * as _ from "lodash";
+import * as bodyParser from "body-parser";
 import { Server as HttpServer } from 'http';
 import routes from "./routes/routes";
 import { runSocketServer } from './socket'
@@ -33,7 +37,6 @@ import APIServer from "./api-server";
 import { initSwaggerDoc } from "./initSwagger";
 import SpinalAPIMiddleware from "./spinalAPIMiddleware";
 import { wrapMiddleware } from "./socket/middlewares";
-
 import * as path from "path";
 import * as config from "../config";
 
@@ -51,11 +54,16 @@ async function runServerRest(server?: HttpServer, app?: express.Express) {
   let api = app || APIServer();
   server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
 
+  api.use(fileUpload({ createParentPath: true }));
+  api.use(cors());
+  api.disable('x-powered-by');
+  api.use(bodyParser.urlencoded({ extended: true }));
+  api.use(bodyParser.json());
+  api.use('/admin', express.static('public'));
 
   api.get('/logo.png', (req, res) => {
     const assets = path.resolve(__dirname, '../assets');
-    res.sendFile(`${assets}/spinalcore.png`)
-    // res.sendFile('spinalcore.png', { root: __dirname });
+    res.sendFile(`${assets}/spinalcore.png`);
   });
 
   initSwaggerDoc(api);

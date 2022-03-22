@@ -39,19 +39,19 @@ function APIServer(): express.Express {
   // enable files upload
   // runSocketServer(app);
 
-  app.use(fileUpload({
-    createParentPath: true
-  }));
+  // app.use(fileUpload({
+  //   createParentPath: true
+  // }));
 
-  app.use(cors());
-  app.disable('x-powered-by');
-  app.use(bodyParser.urlencoded({
-    extended: true
-  }));
-  app.use(bodyParser.json());
-  // app.use(morgan('dev'));
+  // app.use(cors());
+  // app.disable('x-powered-by');
+  // app.use(bodyParser.urlencoded({
+  //   extended: true
+  // }));
+  // app.use(bodyParser.json());
+  // // app.use(morgan('dev'));
 
-  app.use('/admin', express.static('public'));
+  // app.use('/admin', express.static('public'));
 
   return app;
 }

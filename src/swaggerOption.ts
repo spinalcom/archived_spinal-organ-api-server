@@ -59,10 +59,7 @@ export const swaggerOption = {
                 }
             }
         },
-        tags: [{
-            name: "Pub/Sub",
-            description: "pubsub api documentation is available at "
-        }],
+        tags: [],
     },
     apis: getListRequest()
 };

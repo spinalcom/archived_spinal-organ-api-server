@@ -48,6 +48,7 @@ const graphUtils_1 = require("./graphUtils");
 const { SpinalServiceUser } = require('spinal-service-user');
 const config = require("../config");
 const lib_1 = require("./lib");
+const spinal_core_connectorjs_type_2 = require("spinal-core-connectorjs_type");
 class SpinalAPIMiddleware {
     constructor() {
         this.profilesToGraph = new Map();
@@ -60,10 +61,15 @@ class SpinalAPIMiddleware {
         }
         return SpinalAPIMiddleware.instance;
     }
-    initGraph() {
-        const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
-        this.conn = spinal_core_connectorjs_type_1.spinalCore.connect(connect_opt);
-        spinal_core_connectorjs_type_1.spinalCore.load(this.conn, config.file.path, this.onLoadSuccess, this.onLoadError);
+    initGraph(digitalTwinPath, connect) {
+        digitalTwinPath = digitalTwinPath || config.file.path;
+        if (connect)
+            this.conn = connect;
+        if (!this.conn) {
+            const connect_opt = `http://${config.spinalConnector.user}:${config.spinalConnector.password}@${config.spinalConnector.host}:${config.spinalConnector.port}/`;
+            this.conn = spinal_core_connectorjs_type_1.spinalCore.connect(connect_opt);
+        }
+        spinal_core_connectorjs_type_1.spinalCore.load(this.conn, digitalTwinPath, this.onLoadSuccess, this.onLoadError);
     }
     setConnection(connect) {
         this.conn = connect;
@@ -81,6 +87,8 @@ class SpinalAPIMiddleware {
             profileId = profileId || this.principaleGraphId;
             let node = spinal_core_connectorjs_type_1.FileSystem._objects[server_id];
             if (typeof node !== "undefined") {
+                if (node instanceof spinal_core_connectorjs_type_2.File)
+                    return node;
                 const found = yield this._nodeIsBelongUserContext(node, profileId);
                 if (found) {
                     // @ts-ignore
@@ -126,6 +134,8 @@ class SpinalAPIMiddleware {
                     reject({ code: 404, message: "Node is not found" });
                 }
                 else {
+                    if (model instanceof spinal_core_connectorjs_type_2.File)
+                        return resolve(model);
                     const contextFound = yield this._nodeIsBelongUserContext(model, profileId);
                     if (contextFound) {
                         // @ts-ignore
@@ -241,17 +251,17 @@ class SpinalAPIMiddleware {
         console.error(`File does not exist in location ${config.file.path}`);
     }
     onLoadSuccess(forgeFile) {
-        if (config.runLocalServer == "true" || config.runLocalServer === true) {
-            spinal_env_viewer_graph_service_1.SpinalGraphService.setGraph(forgeFile)
-                .then((id) => {
-                if (typeof id !== 'undefined') {
-                    SpinalServiceUser.init();
-                    graphUtils_1.spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
-                    SpinalAPIMiddleware.instance.setPrincipaleGraph(forgeFile);
-                }
-            })
-                .catch(e => console.error(e));
-        }
+        // if (config.runLocalServer == "true" || config.runLocalServer === true) {
+        spinal_env_viewer_graph_service_1.SpinalGraphService.setGraph(forgeFile)
+            .then((id) => {
+            if (typeof id !== 'undefined') {
+                SpinalServiceUser.init();
+                graphUtils_1.spinalGraphUtils.init(SpinalAPIMiddleware.instance.conn);
+                SpinalAPIMiddleware.instance.setPrincipaleGraph(forgeFile);
+            }
+        })
+            .catch(e => console.error(e));
+        // }
     }
 }
 SpinalAPIMiddleware.instance = null;

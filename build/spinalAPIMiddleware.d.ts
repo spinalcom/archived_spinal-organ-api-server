@@ -7,7 +7,7 @@ declare class SpinalAPIMiddleware {
     principaleGraphId: string;
     constructor();
     static getInstance(): SpinalAPIMiddleware;
-    initGraph(): void;
+    initGraph(digitalTwinPath?: string, connect?: spinal.FileSystem): void;
     setConnection(connect: spinal.FileSystem): void;
     getGraph(profileId?: string): SpinalGraph<any>;
     load<T extends spinal.Model>(server_id: number, profileId?: string): Promise<T>;

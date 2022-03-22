@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const spinal_service_ticket_1 = require("spinal-service-ticket");
 const requestUtilities_1 = require("../../../utilities/requestUtilities");
+const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
     * @swagger
@@ -65,14 +66,23 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
     app.post("/api/v1/workflow/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
             const profileId = (0, requestUtilities_1.getProfileId)(req);
-            var childrens = yield spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
+            const userGraph = spinalAPIMiddleware.getGraph(profileId);
+            const graph = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
+            var childrens = yield graph.getChildren("hasContext");
             for (const child of childrens) {
                 if (child.getName().get() === req.body.nameWorkflow) {
                     return res.status(400).send("the name context already exists");
                 }
             }
             if (req.body.nameWorkflow !== "string") {
-                yield spinal_service_ticket_1.serviceTicketPersonalized.createContext(req.body.nameWorkflow, []);
+                const context = yield spinal_service_ticket_1.serviceTicketPersonalized.createContext(req.body.nameWorkflow, []);
+                yield userGraph.addContext(context);
+                return res.status(200).json({
+                    name: context.getName().get(),
+                    type: context.getType().get(),
+                    staticId: context.getId().get(),
+                    dynamicId: context._server_id,
+                });
             }
             else {
                 return res.status(400).send("string is invalide name");
@@ -84,7 +94,6 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                 return res.status(error.code).send(error.message);
             return res.status(400).send("ko");
         }
-        res.json();
     }));
 };
 //# sourceMappingURL=createWorkflow.js.map

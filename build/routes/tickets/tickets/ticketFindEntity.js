@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
+const spinal_service_ticket_1 = require("spinal-service-ticket");
 const requestUtilities_1 = require("../../../utilities/requestUtilities");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
@@ -70,14 +71,25 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             var _ticket = yield spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(_ticket);
-            var elementSelected = yield spinalAPIMiddleware.loadPtr(_ticket.info.elementSelected);
-            var info = {
-                dynamicId: elementSelected._server_id,
-                staticId: elementSelected.getId().get(),
-                name: elementSelected.getName().get(),
-                type: elementSelected.getType().get(),
-            };
-            res.json(info);
+            // var elementSelected = await spinalAPIMiddleware.loadPtr(_ticket.info.elementSelected)
+            const parents = yield _ticket.getParents();
+            const parent = parents.find(el => el.getType().get() !== spinal_service_ticket_1.STEP_TYPE);
+            let info = {};
+            if (parent) {
+                info = {
+                    dynamicId: parent._server_id,
+                    staticId: parent.getId().get(),
+                    name: parent.getName().get(),
+                    type: parent.getType().get(),
+                };
+            }
+            // var info = {
+            //   dynamicId: elementSelected._server_id,
+            //   staticId: elementSelected.getId().get(),
+            //   name: elementSelected.getName().get(),
+            //   type: elementSelected.getType().get(),
+            // }
+            res.status(200).json(info);
         }
         catch (error) {
             console.log(error);

@@ -34,8 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 var http = require('http');
 var fs = require('fs');
-const config_1 = require("../../../config");
-const requestUtilities_1 = require("../../utilities/requestUtilities");
+const { spinalConnector } = require("../../../config");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
      * @swagger
@@ -64,8 +63,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
      */
     app.use('/api/v1/node/:id/download_file', (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const profileId = (0, requestUtilities_1.getProfileId)(req);
-            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
+            var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10));
             var p = yield down(node);
             res.download(p, (error) => { });
         }
@@ -82,7 +80,7 @@ function down(node) {
         node.load((argPath) => {
             const p = `${__dirname}/${node.name.get()}`;
             const f = fs.createWriteStream(p);
-            http.get(`http://${config_1.default.spinalConnector.host}:${config_1.default.spinalConnector.port}/sceen/_?u=${argPath._server_id}`, function (response) {
+            http.get(`http://${spinalConnector.host}:${spinalConnector.port}/sceen/_?u=${argPath._server_id}`, function (response) {
                 response.pipe(f);
                 response.on('end', () => __awaiter(this, void 0, void 0, function* () {
                     resolve(p);

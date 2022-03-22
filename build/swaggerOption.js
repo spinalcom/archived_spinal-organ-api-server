@@ -60,10 +60,7 @@ exports.swaggerOption = {
                 }
             }
         },
-        tags: [{
-                name: "Pub/Sub",
-                description: "pubsub api documentation is available at "
-            }],
+        tags: [],
     },
     apis: (0, listRequest_1.getListRequest)()
 };

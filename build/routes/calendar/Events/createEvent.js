@@ -79,18 +79,22 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   *                 type: number
   *               startDate:
   *                 type: string
+  *                 default: YYYY-MM-DD
   *               endDate:
   *                 type: string
+  *                 default: YYYY-MM-DD
   *               description:
   *                 type: string
   *               repeat:
   *                 type: boolean
   *               repeatEnd:
   *                 type: number
+  *                 default: YYYY-MM-DD
   *               count:
   *                 type: number
   *               period:
   *                 type: number
+  *                 default: day|week|month|year
   *     responses:
   *       200:
   *         description: Updated successfully
@@ -119,18 +123,40 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         groupId: groupe.getId().get(),
                         categoryId: category.getId().get(),
                         nodeId: node.getId().get(),
-                        startDate: (moment(req.body.startDate, "DD MM YYYY HH:mm:ss", true)).toString(),
+                        startDate: (moment(new Date(req.body.startDate))).toString(),
                         description: req.body.description,
-                        endDate: (moment(req.body.endDate, "DD MM YYYY HH:mm:ss", true)).toString(),
-                        periodicity: { count: req.body.count, period: req.body.period },
+                        endDate: (moment(new Date(req.body.endDate))).toString(),
+                        periodicity: { count: req.body.count, period: spinal_env_viewer_task_service_1.Period[req.body.period] },
                         repeat: req.body.repeat,
                         name: req.body.name,
-                        creationDate: (Date.now()).toString(),
-                        repeatEnd: req.body.repeatEnd
+                        creationDate: (moment(new Date().toISOString())).toString(),
+                        repeatEnd: (moment(new Date(req.body.repeatEnd))).toString()
                     };
-                    let user = { username: "string", userId: 0 };
-                    yield spinal_env_viewer_task_service_1.SpinalEventService.createEvent(context.getId().get(), groupe.getId().get(), node.getId().get(), eventInfo, user);
-                    res.send("created");
+                    let user = { username: "admin", userId: 168 };
+                    let result = yield spinal_env_viewer_task_service_1.SpinalEventService.createEvent(context.getId().get(), groupe.getId().get(), node.getId().get(), eventInfo, user);
+                    if (!Array.isArray(result))
+                        result = [result];
+                    const infos = result.map(ticketCreated => {
+                        const node = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(ticketCreated.id.get());
+                        return {
+                            dynamicId: node._server_id,
+                            staticId: ticketCreated.id.get(),
+                            name: ticketCreated.name.get(),
+                            type: ticketCreated.type.get(),
+                            groupeId: ticketCreated.groupId.get(),
+                            categoryId: ticketCreated.categoryId.get(),
+                            nodeId: ticketCreated.nodeId.get(),
+                            startDate: ticketCreated.startDate.get(),
+                            endDate: ticketCreated.endDate.get(),
+                            creationDate: ticketCreated.creationDate.get(),
+                            user: {
+                                username: ticketCreated.user.username.get(),
+                                email: ticketCreated.user.email == undefined ? undefined : ticketCreated.user.email.get(),
+                                gsm: ticketCreated.user.gsm == undefined ? undefined : ticketCreated.user.gsm.get()
+                            }
+                        };
+                    });
+                    return res.status(200).json(infos);
                 }
                 else {
                     return res.status(400).send("this context is not a SpinalEventGroupContext");

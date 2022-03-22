@@ -27,6 +27,7 @@ import * as express from 'express';
 import { NetworkService, ConfigService } from 'spinal-model-bmsnetwork'
 import getInstance from "../networkService";
 import { getProfileId } from '../../../utilities/requestUtilities';
+import { SpinalGraphService } from 'spinal-env-viewer-graph-service';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: SpinalAPIMiddleware) {
   /**
  * @swagger
@@ -63,19 +64,41 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
   app.post("/api/v1/IoTNetworkContext/create", async (req, res, next) => {
 
     try {
-      const profileId = getProfileId(req);
+
       let configService: ConfigService = {
         contextName: req.body.contextName,
         contextType: "Network",
         networkName: req.body.networkName,
         networkType: "NetworkVirtual"
       }
-      getInstance().init(spinalAPIMiddleware.getGraph(profileId), configService, true)
+
+      const graph = SpinalGraphService.getGraph();
+
+      const { contextId, networkId } = await getInstance().init(graph, configService, true)
+      const context = SpinalGraphService.getRealNode(contextId);
+      const network = SpinalGraphService.getRealNode(networkId);
+
+      const profileId = getProfileId(req);
+      const userGraph = spinalAPIMiddleware.getGraph(profileId);
+      await userGraph.addContext(context);
+
+      const result = {
+        context: {
+          ...(context.info.get()),
+          dynamicId: context._server_id
+        },
+
+        network: {
+          ...(network.info.get()),
+          dynamicId: network._server_id
+        }
+      }
+
+      res.status(200).json(result);
     } catch (error) {
       console.error(error)
       res.status(400).send()
     }
-    res.json();
   })
 
 }

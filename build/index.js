@@ -33,6 +33,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wrapMiddleware = exports.spinalAPIMiddleware = exports.runServerRest = void 0;
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 const routes_1 = require("./routes/routes");
 const socket_1 = require("./socket");
 const api_server_1 = require("./api-server");
@@ -53,10 +57,15 @@ function runServerRest(server, app) {
             yield spinalAPIMiddleware.initGraph();
         let api = app || (0, api_server_1.default)();
         server = server || api.listen(port, () => console.log(`Rest api listen on port ${port}`));
+        api.use(fileUpload({ createParentPath: true }));
+        api.use(cors());
+        api.disable('x-powered-by');
+        api.use(bodyParser.urlencoded({ extended: true }));
+        api.use(bodyParser.json());
+        api.use('/admin', express.static('public'));
         api.get('/logo.png', (req, res) => {
             const assets = path.resolve(__dirname, '../assets');
             res.sendFile(`${assets}/spinalcore.png`);
-            // res.sendFile('spinalcore.png', { root: __dirname });
         });
         (0, initSwagger_1.initSwaggerDoc)(api);
         (0, routes_1.default)(logger, api, spinalAPIMiddleware);

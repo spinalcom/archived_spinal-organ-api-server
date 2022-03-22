@@ -26,7 +26,7 @@ import { SpinalContext, SpinalNode, SpinalGraphService } from 'spinal-env-viewer
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { serviceDocumentation } from "spinal-env-viewer-plugin-documentation-service";
-import { serviceTicketPersonalized } from 'spinal-service-ticket'
+import { serviceTicketPersonalized, STEP_TYPE } from 'spinal-service-ticket'
 import { getProfileId } from '../../../utilities/requestUtilities';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -65,17 +65,27 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       //@ts-ignore
       SpinalGraphService._addNode(_ticket)
 
-      var elementSelected = await spinalAPIMiddleware.loadPtr(_ticket.info.elementSelected)
-
-
-      var info = {
-        dynamicId: elementSelected._server_id,
-        staticId: elementSelected.getId().get(),
-        name: elementSelected.getName().get(),
-        type: elementSelected.getType().get(),
+      // var elementSelected = await spinalAPIMiddleware.loadPtr(_ticket.info.elementSelected)
+      const parents = await _ticket.getParents();
+      const parent = parents.find(el => el.getType().get() !== STEP_TYPE);
+      let info = {};
+      if (parent) {
+        info = {
+          dynamicId: parent._server_id,
+          staticId: parent.getId().get(),
+          name: parent.getName().get(),
+          type: parent.getType().get(),
+        }
       }
 
-      res.json(info);
+      // var info = {
+      //   dynamicId: elementSelected._server_id,
+      //   staticId: elementSelected.getId().get(),
+      //   name: elementSelected.getName().get(),
+      //   type: elementSelected.getType().get(),
+      // }
+
+      res.status(200).json(info);
     } catch (error) {
       console.log(error);
       if (error.code && error.message) return res.status(error.code).send(error.message);

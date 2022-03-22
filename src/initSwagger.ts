@@ -25,9 +25,10 @@
 import * as swaggerUi from 'swagger-ui-express';
 import * as swaggerJSDoc from "swagger-jsdoc";
 import * as express from "express";
+import * as fs from "fs";
+import * as path from "path";
 
 import { swaggerOption } from "./swaggerOption";
-import * as fs from "fs";
 
 export function initSwaggerDoc(app: express.Express) {
     let swaggerDocs = swaggerJSDoc(swaggerOption);
@@ -44,11 +45,11 @@ export function initSwaggerDoc(app: express.Express) {
         res.json(swaggerDocs)
     })
 
-    // fs.writeFile('./swagger-spec.json', JSON.stringify(swaggerDocs, null, 2), (err) => {
-    //     if (err) {
-    //         return console.error(err);
-    //     }
-    // });
+    fs.writeFile(path.resolve(__dirname, '../swagger_files/swagger-spec.json'), JSON.stringify(swaggerDocs, null, 2), (err) => {
+        if (err) {
+            return console.error(err);
+        }
+    });
 
     // add swagger docs to API
     app.use('/spinalcom-api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs, swaggerUiOpts));

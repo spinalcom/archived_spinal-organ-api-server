@@ -25,13 +25,16 @@ exports.getListRequest = void 0;
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 const path = require("path");
+const fs = require("fs");
 // import arrayOfRequests from "./absfiles"
-// import { arrayOfRequests } from "./finalList";
+// import { arrayOfRequests } from "../swagger_files/finalList";
 // List all files in a directory in Node.js recursively in a synchronous fashion
 function getListRequest() {
-    const routeDir = path.join(__dirname, 'routes');
+    const routeDir = path.join(__dirname, "..", "src", 'routes');
     const absfiles = walkSync(routeDir);
-    return absfiles.map(el => path.resolve(__dirname, el));
+    createFinalistListFile(absfiles);
+    const paths = absfiles.map(el => path.resolve(__dirname, el));
+    return paths;
     // var doNotMatch = [];
     // var MatchList = [];
     // for (var i = 0; i < absfiles.length; i++) {
@@ -53,7 +56,14 @@ function getListRequest() {
     // return mapList;
 }
 exports.getListRequest = getListRequest;
-var walkSync = function (dir, filelist) {
+const createFinalistListFile = (absFiles) => {
+    fs.writeFile(path.resolve(__dirname, '../swagger_files/finalList.js'), `module.exports = ${JSON.stringify(absFiles, null, 2)}`, function (err) {
+        if (err) {
+            console.error(err);
+        }
+    });
+};
+const walkSync = function (dir, filelist) {
     var path = path || require('path');
     var fs = fs || require('fs'), files = fs.readdirSync(dir);
     filelist = filelist || [];
@@ -65,23 +75,38 @@ var walkSync = function (dir, filelist) {
             filelist.push(path.relative(__dirname, path.join(dir, file)));
         }
     });
-    filelist.sort((a, b) => getIndexCat(a) - getIndexCat(b));
-    return filelist;
+    return filelist.sort((a, b) => getIndexCat(a) - getIndexCat(b));
 };
-function getCat(filePath) {
+const getCat = (filePath) => {
     const dir = filePath.split(path.sep);
     for (let idx = 0; idx < dir.length; idx++) {
         if (dir[idx] === 'routes')
             return dir[idx + 1];
     }
-}
-function getIndexCat(filePath) {
+};
+const getIndexCat = (filePath) => {
     const orderCat = [
-        "contexts", "nodes", "categoriesAttributs", "attributs", "geographicContext", "IoTNetwork", "tickets", "notes", "calendar", "groupContext", "roomGroup", "equipementGroup", "endpointGroup", "Nomenclature Group", "Analytics", "BIM"
+        "contexts",
+        "nodes",
+        "categoriesAttributs",
+        "attributs",
+        "geographicContext",
+        "IoTNetwork",
+        "tickets",
+        "notes",
+        "calendar",
+        "groupContext",
+        "roomGroup",
+        "equipementGroup",
+        "endpointGroup",
+        "NomenclatureGroup",
+        "Analytics",
+        "BIM",
+        "routes"
     ];
     const dir = getCat(filePath);
     if (!dir)
         return 9999;
-    return orderCat.indexOf(dir);
-}
+    return orderCat.findIndex(element => element.toLocaleLowerCase() === dir.toLocaleLowerCase());
+};
 //# sourceMappingURL=listRequest.js.map

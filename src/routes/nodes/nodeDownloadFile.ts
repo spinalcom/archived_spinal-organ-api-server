@@ -35,8 +35,8 @@ import { serviceDocumentation } from 'spinal-env-viewer-plugin-documentation-ser
 import { ServiceUser } from 'spinal-service-user';
 var http = require('http');
 var fs = require('fs');
-import config from '../../../config';
 import { getProfileId } from '../../utilities/requestUtilities';
+const { spinalConnector } = require("../../../config")
 
 module.exports = function (
   logger,
@@ -71,8 +71,8 @@ module.exports = function (
 
   app.use('/api/v1/node/:id/download_file', async (req, res, next) => {
     try {
-      const profileId = getProfileId(req);
-      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
+      var node = await spinalAPIMiddleware.load(parseInt(req.params.id, 10));
+
       var p = await down(node);
       res.download(p, (error) => { });
     } catch (error) {
@@ -90,7 +90,7 @@ function down(node): Promise<string> {
       const f = fs.createWriteStream(p);
 
       http.get(
-        `http://${config.spinalConnector.host}:${config.spinalConnector.port}/sceen/_?u=${argPath._server_id}`,
+        `http://${spinalConnector.host}:${spinalConnector.port}/sceen/_?u=${argPath._server_id}`,
         function (response) {
           response.pipe(f);
           response.on('end', async () => {

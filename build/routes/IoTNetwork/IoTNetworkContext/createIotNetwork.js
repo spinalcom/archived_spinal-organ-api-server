@@ -34,6 +34,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const networkService_1 = require("../networkService");
 const requestUtilities_1 = require("../../../utilities/requestUtilities");
+const spinal_env_viewer_graph_service_1 = require("spinal-env-viewer-graph-service");
 module.exports = function (logger, app, spinalAPIMiddleware) {
     /**
    * @swagger
@@ -66,20 +67,29 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
   */
     app.post("/api/v1/IoTNetworkContext/create", (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            const profileId = (0, requestUtilities_1.getProfileId)(req);
             let configService = {
                 contextName: req.body.contextName,
                 contextType: "Network",
                 networkName: req.body.networkName,
                 networkType: "NetworkVirtual"
             };
-            (0, networkService_1.default)().init(spinalAPIMiddleware.getGraph(profileId), configService, true);
+            const graph = spinal_env_viewer_graph_service_1.SpinalGraphService.getGraph();
+            const { contextId, networkId } = yield (0, networkService_1.default)().init(graph, configService, true);
+            const context = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(contextId);
+            const network = spinal_env_viewer_graph_service_1.SpinalGraphService.getRealNode(networkId);
+            const profileId = (0, requestUtilities_1.getProfileId)(req);
+            const userGraph = spinalAPIMiddleware.getGraph(profileId);
+            yield userGraph.addContext(context);
+            const result = {
+                context: Object.assign(Object.assign({}, (context.info.get())), { dynamicId: context._server_id }),
+                network: Object.assign(Object.assign({}, (network.info.get())), { dynamicId: network._server_id })
+            };
+            res.status(200).json(result);
         }
         catch (error) {
             console.error(error);
             res.status(400).send();
         }
-        res.json();
     }));
 };
 //# sourceMappingURL=createIotNetwork.js.map

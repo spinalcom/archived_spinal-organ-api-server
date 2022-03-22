@@ -22,20 +22,13 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import {
-  SpinalContext,
-  SpinalNode,
-  SpinalGraphService,
-} from 'spinal-env-viewer-graph-service';
+import { SpinalContext, SpinalNode, SpinalGraphService, } from 'spinal-env-viewer-graph-service';
 import spinalAPIMiddleware from '../../spinalAPIMiddleware';
 import * as express from 'express';
-import { serviceTicketPersonalized } from 'spinal-service-ticket';
+import { PROCESS_TYPE, STEP_RELATION_NAME, STEP_TYPE, TICKET_RELATION_NAME } from 'spinal-service-ticket';
 import { getProfileId } from '../../utilities/requestUtilities';
-module.exports = function (
-  logger,
-  app: express.Express,
-  spinalAPIMiddleware: spinalAPIMiddleware
-) {
+
+module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
    * @swagger
    * /api/v1/node/{id}/ticket_list:
@@ -78,7 +71,7 @@ module.exports = function (
       SpinalGraphService._addNode(node);
 
 
-      var ticketList = await node.getChildren('SpinalSystemServiceTicketHasTicket');
+      var ticketList = await node.getChildren(TICKET_RELATION_NAME);
       for (const ticket of ticketList) {
         //context && workflow
         const workflow = SpinalGraphService.getRealNode(
@@ -87,21 +80,19 @@ module.exports = function (
 
         //Step
         let _step = await ticket
-          .getParents('SpinalSystemServiceTicketHasTicket')
+          .getParents(TICKET_RELATION_NAME)
           .then((steps) => {
             for (const step of steps) {
-              if (
-                step.getType().get() === 'SpinalSystemServiceTicketTypeStep'
-              ) {
+              if (step.getType().get() === STEP_TYPE) {
                 return step;
               }
             }
           });
         let _process = await _step
-          .getParents('SpinalSystemServiceTicketHasStep')
+          .getParents(STEP_RELATION_NAME)
           .then((processes) => {
             for (const process of processes) {
-              if (process.getType().get() === 'SpinalServiceTicketProcess') {
+              if (process.getType().get() === PROCESS_TYPE) {
                 return process;
               }
             }

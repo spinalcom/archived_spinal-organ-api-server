@@ -32,10 +32,7 @@ export declare const swaggerOption: {
                 };
             };
         };
-        tags: {
-            name: string;
-            description: string;
-        }[];
+        tags: any[];
     };
     apis: string[];
 };

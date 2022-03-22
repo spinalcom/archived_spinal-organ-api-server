@@ -25,6 +25,7 @@ import { serviceTicketPersonalized } from 'spinal-service-ticket'
 import spinalAPIMiddleware from '../../../spinalAPIMiddleware';
 import * as express from 'express';
 import { getProfileId } from '../../../utilities/requestUtilities';
+import { SpinalGraphService } from 'spinal-env-viewer-graph-service';
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
   * @swagger
@@ -56,15 +57,27 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.post("/api/v1/workflow/create", async (req, res, next) => {
     try {
       const profileId = getProfileId(req);
-      var childrens = await spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
+      const userGraph = spinalAPIMiddleware.getGraph(profileId);
+      const graph = SpinalGraphService.getGraph();
+      var childrens = await graph.getChildren("hasContext");
 
       for (const child of childrens) {
         if (child.getName().get() === req.body.nameWorkflow) {
           return res.status(400).send("the name context already exists")
         }
       }
+
       if (req.body.nameWorkflow !== "string") {
-        await serviceTicketPersonalized.createContext(req.body.nameWorkflow, []);
+        const context = await serviceTicketPersonalized.createContext(req.body.nameWorkflow, []);
+        await userGraph.addContext(context);
+
+        return res.status(200).json({
+          name: context.getName().get(),
+          type: context.getType().get(),
+          staticId: context.getId().get(),
+          dynamicId: context._server_id,
+        });
+
       } else {
         return res.status(400).send("string is invalide name");
       }
@@ -73,6 +86,5 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       if (error.code && error.message) return res.status(error.code).send(error.message);
       return res.status(400).send("ko");
     }
-    res.json();
   })
 }

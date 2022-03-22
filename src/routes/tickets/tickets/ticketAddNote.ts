@@ -75,7 +75,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       var ticket: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(ticket)
-      var user = { username: "admin", userId: 0 }
+      var user = { username: "admin", userId: 168 }
       // console.log("6582658", await serviceDocumentation.addNote(ticket, user, req.body.note));
 
       const note = await serviceDocumentation.addNote(ticket, user, req.body.note)
