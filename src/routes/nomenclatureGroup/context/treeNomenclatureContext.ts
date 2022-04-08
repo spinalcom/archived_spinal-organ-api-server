@@ -85,7 +85,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
     } catch (error) {
       console.error(error);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json(contexts);
   });

@@ -69,7 +69,6 @@ async function sceneGetItems(sceneNode: SpinalNode<any>): Promise<IScenesItemsIt
 }
 
 function getFolderPath(itemPath: string): string {
-  console.log("itemPath", itemPath);
   return itemPath.split("/")[0];
 }
 

@@ -76,7 +76,7 @@ module.exports = function (
       var p = await down(node);
       res.download(p, (error) => { });
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send('ko');
     }
@@ -97,7 +97,7 @@ function down(node): Promise<string> {
             resolve(p);
           });
           response.on('error', function (err) {
-            console.log(err);
+            console.error(err);
           });
         }
       );

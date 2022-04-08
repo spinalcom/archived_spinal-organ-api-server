@@ -61,9 +61,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       var childrens = await spinalAPIMiddleware.getGraph(profileId).getChildren("hasContext");
 
       for (const child of childrens) {
-        console.log(child);
-        console.log(child.getType().get(), SERVICE_TYPE);
-
         if (child.getType().get() === SERVICE_TYPE) {
           let info: Workflow = {
             dynamicId: child._server_id,

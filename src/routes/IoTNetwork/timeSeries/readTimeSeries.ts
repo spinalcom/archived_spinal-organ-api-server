@@ -93,8 +93,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
           end: verifDate(req.params.end)
         }
         var datas = await spinalServiceTimeSeries().getData(node.getId().get(), timeSeriesIntervalDate)
-        console.log(datas);
-
       }
 
     } catch (error) {

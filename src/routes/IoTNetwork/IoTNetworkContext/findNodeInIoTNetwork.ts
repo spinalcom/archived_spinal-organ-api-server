@@ -77,7 +77,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       if (IoTNetwork.getType().get() === "Network" && typeof node === "undefined") {
         node = await findOneInContext(IoTNetwork, IoTNetwork, (n) => n.getId().get() === req.params.nodeId)
         if (typeof node === "undefined") {
-          return res.status(400).send("ko");
+          return res.status(500).send(error.message);
         }
         // @ts-ignore
         SpinalGraphService._addNode(node);
@@ -92,9 +92,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
         type: node.getType().get(),
       }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json(info);
   })

@@ -27,6 +27,7 @@ import * as express from 'express';
 import { SpinalContext, SpinalGraphService } from 'spinal-env-viewer-graph-service';
 import { ContextTree } from '../contexts/interfacesContexts'
 import { recTreeDepth } from '../../utilities/recTree'
+import { getProfileId } from '../../utilities/requestUtilities';
 
 module.exports = function (logger, app: express.Express, spinalAPIMiddleware: spinalAPIMiddleware) {
   /**
@@ -54,7 +55,10 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
   app.get("/api/v1/geographicContext/space", async (req, res, next) => {
     var contexts: ContextTree;
     try {
-      let geographicContexts = await SpinalGraphService.getContextWithType("geographicContext");
+      const profileId = getProfileId(req);
+      const userGraph = spinalAPIMiddleware.getGraph(profileId);
+      const temp_contexts = await userGraph.getChildren("hasContext");
+      let geographicContexts = temp_contexts.filter(el => el.getType().get() === "geographicContext");
       let geographicContext = geographicContexts[0];
       if (geographicContext instanceof SpinalContext) {
         contexts = {
@@ -69,7 +73,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
     } catch (error) {
       console.error(error);
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json(contexts);
   });

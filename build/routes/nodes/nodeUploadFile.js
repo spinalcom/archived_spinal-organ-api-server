@@ -79,7 +79,6 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             var node = yield spinalAPIMiddleware.load(parseInt(req.params.id, 10), profileId);
             //@ts-ignore
             spinal_env_viewer_graph_service_1.SpinalGraphService._addNode(node);
-            console.log(req);
             // @ts-ignore
             if (!req.files) {
                 res.send({

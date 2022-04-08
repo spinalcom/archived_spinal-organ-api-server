@@ -89,21 +89,15 @@ module.exports = function (
       try {
         const profileId = getProfileId(req);
         var _roomList = [];
-        var context: SpinalNode<any> = await spinalAPIMiddleware.load(
-          parseInt(req.params.contextId, 10), profileId
-        );
+        var context: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.contextId, 10), profileId);
         //@ts-ignore
         SpinalGraphService._addNode(context);
 
-        var category: SpinalNode<any> = await spinalAPIMiddleware.load(
-          parseInt(req.params.categoryId, 10), profileId
-        );
+        var category: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.categoryId, 10), profileId);
         //@ts-ignore
         SpinalGraphService._addNode(category);
 
-        var group: SpinalNode<any> = await spinalAPIMiddleware.load(
-          parseInt(req.params.groupId, 10), profileId
-        );
+        var group: SpinalNode<any> = await spinalAPIMiddleware.load(parseInt(req.params.groupId, 10), profileId);
         //@ts-ignore
         SpinalGraphService._addNode(group);
 
@@ -131,11 +125,14 @@ module.exports = function (
         } else {
           res.status(400).send('category or group not found in context');
         }
+
+        res.json(_roomList);
+
       } catch (error) {
-        console.log(error);
+
+        if (error.code && error.message) return res.status(error.code).send(error.message);
         res.status(400).send('ko');
       }
-      res.json(_roomList);
     }
   );
 };

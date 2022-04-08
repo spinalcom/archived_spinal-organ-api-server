@@ -23,7 +23,6 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-;
 /**
  * @swagger
  * components:
@@ -32,5 +31,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *       type: array
  *       items:
  *         type: string
- */
+ */ 
 //# sourceMappingURL=interfacesContexts.js.map

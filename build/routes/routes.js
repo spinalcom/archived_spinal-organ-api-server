@@ -69,6 +69,7 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./BIM/scenes/list')(logger, app);
     require('./BIM/scenes/default')(logger, app);
     require('./BIM/scenes/item')(logger, app);
+    require('./BIM/bimFileContext')(logger, app, spinalAPIMiddleware);
     require('./BIM/viewer/viewer')(logger, app);
     require('./BIM/getBimObjectsInfo')(logger, app);
     // tickets routes
@@ -221,7 +222,9 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./roomGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
     require('./roomGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
     require('./roomGroup/room/listRoom')(logger, app, spinalAPIMiddleware);
-    // Rooms Group
+    require('./roomGroup/room/addRoomList')(logger, app, spinalAPIMiddleware);
+    require('./roomGroup/room/deleteRoomFromGroup')(logger, app, spinalAPIMiddleware);
+    // Endpoints Group
     // Context
     require('./endpointGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
     require('./endpointGroup/context/treeGroupContext')(logger, app, spinalAPIMiddleware);
@@ -241,6 +244,10 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./endpointGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
     require('./endpointGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
     require('./endpointGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
+    // endpoint
+    require('./endpointGroup/endpoint/endpointList')(logger, app, spinalAPIMiddleware);
+    require('./endpointGroup/endpoint/addEndPointList')(logger, app, spinalAPIMiddleware);
+    require('./endpointGroup/endpoint/deleteEndPointList')(logger, app, spinalAPIMiddleware);
     // Equipements Group
     // Context
     require('./equipementGroup/context/listGroupContext')(logger, app, spinalAPIMiddleware);
@@ -261,6 +268,10 @@ function routes(logger, app, spinalAPIMiddleware) {
     require('./equipementGroup/group/updateGroup')(logger, app, spinalAPIMiddleware);
     require('./equipementGroup/group/deleteGroup')(logger, app, spinalAPIMiddleware);
     require('./equipementGroup/group/readGroup')(logger, app, spinalAPIMiddleware);
+    // equipement
+    require('./equipementGroup/equipement/equipementList')(logger, app, spinalAPIMiddleware);
+    require('./equipementGroup/equipement/addEquipementList')(logger, app, spinalAPIMiddleware);
+    require('./equipementGroup/equipement/deleteEquipementFromGroup')(logger, app, spinalAPIMiddleware);
     //endPoints routes
     // context nomenclature
     require('./nomenclatureGroup/context/listContextNomenclature')(logger, app, spinalAPIMiddleware);

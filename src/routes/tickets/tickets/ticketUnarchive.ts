@@ -86,9 +86,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       SpinalGraphService._addNode(ticket)
       await serviceTicketPersonalized.unarchiveTicket(workflow.getId().get(), process.getId().get(), ticket.getId().get())
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json();
   })

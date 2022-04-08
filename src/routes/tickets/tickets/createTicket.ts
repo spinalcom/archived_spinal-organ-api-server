@@ -224,15 +224,13 @@ module.exports = function (
       //   streamObj.push(null)
       //   var pipe = streamObj.pipe(fs.createWriteStream('./' + image.name));
       //   pipe.on('finish', function () {
-      //     console.log("pipe.ON");
       //     const fileData = new LocalFileData('./' + image.name)
-      //     console.log("filedata", fileData);
 
       //   });
 
       // }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send({ ko: error });
     }

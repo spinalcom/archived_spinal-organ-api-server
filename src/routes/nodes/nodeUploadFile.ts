@@ -86,7 +86,6 @@ module.exports = function (
       );
       //@ts-ignore
       SpinalGraphService._addNode(node);
-      console.log(req);
 
       // @ts-ignore
       if (!req.files) {
@@ -125,7 +124,7 @@ module.exports = function (
         });
       }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
       res.status(400).send('ko');
     }

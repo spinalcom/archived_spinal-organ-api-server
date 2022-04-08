@@ -74,7 +74,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
       // @ts-ignore
       SpinalGraphService._addNode(node);
       var endpoints = await node.getChildren(["hasEndPoint", SpinalBmsEndpoint.relationName]);
-      console.log(endpoints);
 
 
       for (const endpoint of endpoints) {

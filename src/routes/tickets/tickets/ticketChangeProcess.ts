@@ -78,12 +78,11 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       var ticket = await spinalAPIMiddleware.load(parseInt(req.params.ticketId, 10), profileId);
       //@ts-ignore
       SpinalGraphService._addNode(ticket)
-      console.log(process.getName().get());
       await serviceTicketPersonalized.changeTicketProcess(ticket.getId().get(), process.getId().get())
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json();
   })

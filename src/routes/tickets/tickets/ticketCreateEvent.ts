@@ -171,7 +171,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
 
           return res.status(200).json(infos);
           // var ticketCreated = SpinalGraphService.getRealNode(result.id.get())
-          // console.log(ticketCreated._server_id);
 
           // var info = {
           //   dynamicId: ticketCreated._server_id,
@@ -198,9 +197,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
         res.status(400).send("the node is not of type Ticket")
       }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     // res.json(info);
   })

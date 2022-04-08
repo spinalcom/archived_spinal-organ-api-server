@@ -1,1 +1,1 @@
-export declare function runSocketServer(app: any): void;
+export declare function runSocketServer(app: any): Promise<void>;

@@ -76,7 +76,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       //@ts-ignore
       SpinalGraphService._addNode(ticket)
       var user = { username: "admin", userId: 168 }
-      // console.log("6582658", await serviceDocumentation.addNote(ticket, user, req.body.note));
 
       const note = await serviceDocumentation.addNote(ticket, user, req.body.note)
       const elementNote = await note.element.load()
@@ -93,9 +92,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       }
 
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json(info);
   })

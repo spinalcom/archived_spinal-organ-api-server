@@ -78,7 +78,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
       SpinalGraphService._addNode(groupContext)
       if (groupContext.getType().get() === "AttributeConfigurationGroupContext") {
         var contextUpdated = await spinalNomenclatureService.updateContext(groupContext.getId().get(), req.body.newNomenclatureContextName)
-        console.log(contextUpdated);
         var info = {
           dynamicId: contextUpdated._server_id,
           staticId: contextUpdated.getId().get(),

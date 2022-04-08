@@ -83,6 +83,7 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
                         version: bimObject.info.version.get(),
                         externalId: bimObject.info.externalId.get(),
                         dbid: bimObject.info.dbid.get(),
+                        bimFileId: bimObject.info.bimFileId.get()
                     };
                     _bimObjects.push(infoBimObject);
                 }
@@ -100,12 +101,13 @@ module.exports = function (logger, app, spinalAPIMiddleware) {
             }
             var info = {
                 area: sommes,
-                bimFileId: bimFileId,
                 _bimObjects: _bimObjects
             };
         }
         catch (error) {
             console.error(error);
+            if (error.code && error.message)
+                return res.status(error.code).send(error.message);
             res.status(400).send("list of floor is not loaded");
         }
         res.send(info);

@@ -130,7 +130,6 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
           // @ts-ignore
           const _child = SpinalGraphService.getRealNode(child.id.get())
           if (_child.getType().get() === "SpinalEvent") {
-            console.log(_child);
 
             let info = {
               dynamicId: _child._server_id,
@@ -157,9 +156,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       }
 
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json(nodes);
   })

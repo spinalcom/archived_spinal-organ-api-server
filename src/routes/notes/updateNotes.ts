@@ -73,18 +73,16 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
       SpinalGraphService._addNode(node)
       var notes = await serviceDocumentation.getNotes(node)
 
-      console.log(notes[0]);
-
       var user = { username: "string", userId: 0 }
 
+      res.json();
 
       // await serviceDocumentation.editNote(element, req.body.note)
 
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
-    res.json();
   })
 }

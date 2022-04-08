@@ -45,7 +45,31 @@ export interface Context {
   type: string;
 }
 
-
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     BIMFileContext:
+ *       type: "object"
+ *       properties:
+ *         dynamicId:
+ *           type: "integer"
+ *         staticId:
+ *           type: "string"
+ *         name:
+ *           type: "string"
+ *         type:
+ *           type: "string"
+ *         path:
+ *           type: "string"
+ */
+export interface BIMFileContext {
+  dynamicId: number;
+  staticId: string;
+  name: string;
+  type: string;
+  path: string;
+}
 
 /**
  * @swagger
@@ -67,13 +91,12 @@ export interface Context {
  *         indirectModificationDate:
  *           type: "integer"
  */
- export interface NodeWithDate {
+export interface NodeWithDate {
   dynamicId: number;
   staticId: string;
   name: string;
   type: string;
 }
-
 
 /**
  * @swagger
@@ -121,14 +144,13 @@ export interface ContextNodeofTypes {
  *            $ref: '#/components/schemas/Context'
  */
 export interface ContextTree {
-  dynamicId: number,
-  staticId: string,
-  name: string,
-  type: string,
-  context?: string,
-  children: ContextTree[]
-};
-
+  dynamicId: number;
+  staticId: string;
+  name: string;
+  type: string;
+  context?: string;
+  children: ContextTree[];
+}
 
 /**
  * @swagger
@@ -139,5 +161,3 @@ export interface ContextTree {
  *       items:
  *         type: string
  */
-
-

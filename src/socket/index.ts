@@ -30,7 +30,7 @@ import { setMiddleware } from './middlewares'
 const serverOption: any = { pingTimeout: 30000, maxHttpBufferSize: 1e8, transports: ["websocket"] };
 
 
-export function runSocketServer(app: any) {
+export async function runSocketServer(app: any) {
 
     const io = new Server(app, serverOption);
 

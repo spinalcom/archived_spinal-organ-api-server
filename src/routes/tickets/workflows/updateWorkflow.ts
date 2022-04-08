@@ -84,7 +84,7 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: sp
         return res.status(400).send("this context is not a SpinalSystemServiceTicket Or string is invalid name");
       }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
       return res.status(400).send("ko")
     }

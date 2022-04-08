@@ -64,9 +64,9 @@ module.exports = function (logger, app: express.Express, spinalAPIMiddleware: Sp
         res.status(400).send("this context is not a Network");
       }
     } catch (error) {
-      console.log(error);
+
       if (error.code && error.message) return res.status(error.code).send(error.message);
-      res.status(400).send("ko");
+      res.status(500).send(error.message);
     }
     res.json();
   })

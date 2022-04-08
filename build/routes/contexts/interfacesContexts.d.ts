@@ -24,6 +24,31 @@ export interface Context {
  * @swagger
  * components:
  *   schemas:
+ *     BIMFileContext:
+ *       type: "object"
+ *       properties:
+ *         dynamicId:
+ *           type: "integer"
+ *         staticId:
+ *           type: "string"
+ *         name:
+ *           type: "string"
+ *         type:
+ *           type: "string"
+ *         path:
+ *           type: "string"
+ */
+export interface BIMFileContext {
+    dynamicId: number;
+    staticId: string;
+    name: string;
+    type: string;
+    path: string;
+}
+/**
+ * @swagger
+ * components:
+ *   schemas:
  *     NodeWithDate:
  *       type: "object"
  *       properties:
@@ -106,4 +131,4 @@ export interface ContextTree {
  *       type: array
  *       items:
  *         type: string
- */
+ */ 

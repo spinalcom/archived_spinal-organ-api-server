@@ -25,11 +25,14 @@
 import { Server, Socket } from "socket.io";
 import { subscribeHandler } from "./subscribeHandler";
 import { disconnecthandler } from './disconnectionHandler';
+import { socketIoDataBase } from "../database";
 
 
 export function connectionHandler(io: Server) {
-    io.on("connection", (socket: Socket) => {
-        // const { handshake: { address, auth } } = socket;
+    io.on("connection", async (socket: Socket) => {
+        const { handshake: { address, auth: { socket_identifiant } } } = socket;
+
+
         subscribeHandler(io, socket);
         disconnecthandler(socket);
     })
